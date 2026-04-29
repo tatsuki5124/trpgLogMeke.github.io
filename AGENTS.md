@@ -70,3 +70,13 @@ pnpm lint         # ESLint
 - `lib/` はフレームワーク非依存（`parseLogHtml` のみ DOMParser 依存）
 - ゲームシステムは `LogmakeSystem` インターフェース経由で抽象化（`systems/types.ts`）
 - TypeScript strict mode・`any` 禁止
+
+## 既知の設計上の注意点
+
+- **`renderToken` の `token.content` はエスケープしない（意図的）**
+  CCFOLIA の innerHTML をそのまま出力 HTML に通している。
+  `escapeText()` を適用すると CCFOLIA のインライン書式（`<b>` 等）が壊れる。
+  将来「セキュリティ修正」として誤ってエスケープを追加しないこと。
+
+- **`parseLogHtml` はブラウザ専用**（`DOMParser` 依存）
+  Node.js 環境でテストする場合は jsdom が必要（vitest.config の `environment: 'jsdom'` で対応済み）。

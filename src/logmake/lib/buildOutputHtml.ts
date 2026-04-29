@@ -142,6 +142,8 @@ function renderParagraph(paragraph: ContentParagraph): string {
  * @param token - 変換対象のトークン
  * @returns HTML 文字列
  */
+// token.content は CCFOLIA の innerHTML をそのまま通す（意図的・escapeText 不可）。
+// エスケープすると CCFOLIA のインライン書式（<b> 等）が壊れる。
 function renderToken(token: ContentToken): string {
   if (token.highlight === 'success') {
     return `<span style="background: ${SUCCESS_HIGHLIGHT};">${token.content}</span>`

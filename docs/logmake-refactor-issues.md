@@ -27,21 +27,21 @@ React 移行版の完了済み項目、判断保留項目、今後の改善候�
 | system adapter 化     | system ごとの公開窓口、ダイス抽出、成長判定を分け、初期技能値も adapter から取得するようにした。            |
 | OutputModel 安全化    | タブ表示名と出力 HTML 内の `id` / `class` を分け、特殊文字を含むタブ名でも表示切替が壊れないようにした。    |
 | 純粋関数テスト補強    | `buildOutputModel` と `buildGrowthSummaryText` の直接テストを追加し、出力境界と成長サマリー整形を固定した。 |
+| Zustand 削除          | 実際に import されていなかったため `dependencies` から削除。状態管理は `useLogmakePageState` のみ。           |
+| CSS カラー検証        | `buildOutputHtml` の設定色とタブ色を `sanitizeCssColor()` で検証し、不正値を `#ffffff` にフォールバック。    |
 
 ## 保留した判断
 
 ### Zustand 導入
 
-現時点では不要。
+削除済み（`dependencies` から除去）。
 
-理由:
+再導入するなら、次のどれかが必要になった時点で検討する:
 
-- `App` から各 feature component への props 受け渡しが 1 段で済んでいる。
-- state を複数ページで共有していない。
-- localStorage 永続化がまだない。
-- 学習目的として、まず React 標準の state owner を理解した方がよい。
+- 設定の localStorage 永続化
+- 複数ページ間での状態共有
 
-導入するなら、設定永続化や複数ページ共有が必要になった時点で再検討する。
+それまでは `useLogmakePageState` カスタムフックで十分。
 
 ### visibleTabs のリフトアップ
 
