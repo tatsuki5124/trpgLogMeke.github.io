@@ -27,8 +27,9 @@ src/
     ├── lib/                     # ビジネスロジック（React 非依存）
     │   ├── parseLogHtml.ts      # ※DOMParser 依存のため例外
     │   ├── analyzeGrowth.ts / buildOutputModel.ts
-    │   ├── buildOutputHtml.ts   # sanitizeCssColor() で色値を検証
+    │   ├── buildOutputHtml.ts
     │   ├── buildGrowthSummaryText.ts
+    │   ├── htmlUtils.ts         # escapeText / sanitizeCssColor
     │   └── utils/downloadFile.ts
     ├── hooks/useLogmakePageState.ts  # 状態管理の中心
     ├── components/features/     # UI コンポーネント
