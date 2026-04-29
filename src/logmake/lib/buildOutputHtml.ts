@@ -90,7 +90,7 @@ function renderSection(section: OutputSection): string {
 
   const style = isPrimaryTab(section.tabName)
     ? ''
-    : ` style="border-left: 3px solid ${section.tabColor};"`
+    : ` style="border-left: 3px solid ${sanitizeCssColor(section.tabColor)};"`
 
   return `<div class="${className}"${style}>
     ${section.entries.map(renderSpeaker).join('\n')}
@@ -161,6 +161,9 @@ function renderToken(token: ContentToken): string {
  * @returns style タグを含む HTML 文字列
  */
 function buildStyle(settings: LogmakeSettings): string {
+  const frame = sanitizeCssColor(settings.frameColor)
+  const name = sanitizeCssColor(settings.nameColor)
+  const back = sanitizeCssColor(settings.backColor)
   return `<style>
   @import url('https://fonts.googleapis.com/css?family=Noto+Sans+JP');
   @import url('https://fonts.googleapis.com/css2?family=New+Tegomin&family=Sawarabi+Mincho&display=swap');
@@ -168,11 +171,11 @@ function buildStyle(settings: LogmakeSettings): string {
     font-size: 16px;
   }
   body {
-    background-color: ${settings.frameColor};
+    background-color: ${frame};
     font-family: 'Hiragino Sans', sans-serif;
   }
   .header{
-    background-color: ${settings.frameColor};
+    background-color: ${frame};
     width:100%;
     position: fixed;
     z-index: 999;
@@ -180,24 +183,24 @@ function buildStyle(settings: LogmakeSettings): string {
     left:0;
   }
   details {
-    background-color: ${settings.frameColor};
+    background-color: ${frame};
     padding: .3rem;
     margin: 0;
   }
   summary {
     padding-left: 3rem;
     margin: 0;
-    color: ${settings.nameColor};
+    color: ${name};
   }
   h1 {
     padding: .3rem .3rem .3rem 3rem;
     margin: 0;
-    color: ${settings.nameColor};
+    color: ${name};
     font-family: 'New Tegomin', serif;
   }
   .viewCheck{
     padding-left: 3rem;
-    color: ${settings.nameColor};
+    color: ${name};
   }
   .viewCheck label{
     display: inline-block;
@@ -206,8 +209,8 @@ function buildStyle(settings: LogmakeSettings): string {
   .box5 {
     padding: 2rem;
     margin: 6rem 2rem 2rem;
-    border: double 5px ${settings.frameColor};
-    background-color: ${settings.backColor};
+    border: double 5px ${frame};
+    background-color: ${back};
   }
   .box5 p {
     margin: 0;
@@ -228,7 +231,7 @@ function buildStyle(settings: LogmakeSettings): string {
     padding: 1rem 1.5rem .5rem 1rem;
     border: solid 3px #888888;
     border-radius: 8px;
-    background: ${settings.backColor};
+    background: ${back};
     line-height: 1.5;
   }
   .box .box-title {
@@ -238,7 +241,7 @@ function buildStyle(settings: LogmakeSettings): string {
     left: .5rem;
     padding: 0 .5rem;
     line-height: 1;
-    background: ${settings.backColor};
+    background: ${back};
     color: #888888;
     font-weight: bold;
   }
@@ -300,4 +303,26 @@ function escapeText(text: string): string {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;')
+}
+
+const SAFE_HEX_COLOR = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/
+const SAFE_RGBA_COLOR = /^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/
+
+/**
+ * CSS プロパティ値として使用する色文字列を検証し、不正な値は安全なフォールバックに置換する。
+ * 許可形式: #RGB, #RRGGBB, rgb(...), rgba(...), transparent
+ *
+ * @param value - 検証する色文字列
+ * @returns 安全な CSS 色文字列
+ */
+function sanitizeCssColor(value: string): string {
+  const trimmed = value.trim()
+  if (
+    trimmed === 'transparent' ||
+    SAFE_HEX_COLOR.test(trimmed) ||
+    SAFE_RGBA_COLOR.test(trimmed)
+  ) {
+    return trimmed
+  }
+  return '#ffffff'
 }

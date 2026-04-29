@@ -81,7 +81,7 @@ describe('buildOutputHtml', () => {
     expect(output).not.toContain('タブ&lt;&quot;quoted&quot;&gt; tab')
   })
 
-  it('inserts color values into style attributes without modification', () => {
+  it('inserts valid hex color values into style attributes unchanged', () => {
     const emptyModel: OutputModel = { sections: [], toggles: [] }
     const output = buildOutputHtml(emptyModel, {
       ...createDefaultSettings('test'),
@@ -91,5 +91,49 @@ describe('buildOutputHtml', () => {
 
     expect(output).toContain('#123456')
     expect(output).toContain('#abcdef')
+  })
+
+  it('inserts valid rgba color values into style attributes unchanged', () => {
+    const emptyModel: OutputModel = { sections: [], toggles: [] }
+    const output = buildOutputHtml(emptyModel, {
+      ...createDefaultSettings('test'),
+      frameColor: 'rgba(255,255,255,0)',
+      backColor: 'rgba(100, 149, 237, 0.5)',
+    })
+
+    expect(output).toContain('rgba(255,255,255,0)')
+    expect(output).toContain('rgba(100, 149, 237, 0.5)')
+  })
+
+  it('replaces invalid CSS color values in settings with a safe fallback', () => {
+    const emptyModel: OutputModel = { sections: [], toggles: [] }
+    const output = buildOutputHtml(emptyModel, {
+      ...createDefaultSettings('test'),
+      frameColor: '#fff; } body { display: none }',
+      nameColor: 'javascript:alert(1)',
+      backColor: 'expression(alert(1))',
+    })
+
+    expect(output).not.toContain('display: none')
+    expect(output).not.toContain('javascript:')
+    expect(output).not.toContain('expression(')
+  })
+
+  it('replaces invalid CSS color in section tabColor with a safe fallback', () => {
+    const model: OutputModel = {
+      sections: [
+        {
+          tabName: '雑談',
+          tabColor: '#ff0000; } body { display: none }',
+          tabVisibilityClass: 'logmake-tab-0',
+          entries: [],
+        },
+      ],
+      toggles: [],
+    }
+
+    const output = buildOutputHtml(model, createDefaultSettings('test'))
+
+    expect(output).not.toContain('display: none')
   })
 })
