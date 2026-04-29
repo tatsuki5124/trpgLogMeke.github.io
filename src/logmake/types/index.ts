@@ -144,6 +144,7 @@ export interface GrowthAnalysis {
 /** 成長サマリー各列の表示切り替え状態 */
 export interface ToggleVisibility {
   tabName: boolean
+  value: boolean
   status: boolean
 }
 

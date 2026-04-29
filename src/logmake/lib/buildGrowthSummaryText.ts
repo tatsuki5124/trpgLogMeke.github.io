@@ -40,7 +40,7 @@ export function buildGrowthSummaryText(
         const parts = [
           filters.visibility.tabName ? `[${record.tabName}]` : '',
           record.ginou,
-          `＞ ${record.value}`,
+          filters.visibility.value ? `＞ ${record.value}` : '',
         ].filter(Boolean)
         lines.push(parts.join(' '))
       }

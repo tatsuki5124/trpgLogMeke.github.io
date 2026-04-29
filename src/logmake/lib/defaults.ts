@@ -87,6 +87,7 @@ export function createGrowthFilters(
     labels: labelVisibility,
     visibility: {
       tabName: previous?.visibility.tabName ?? true,
+      value: previous?.visibility.value ?? true,
       status: previous?.visibility.status ?? true,
     },
   }
