@@ -170,10 +170,6 @@ trpgLogMeke.github.io/
 <type>: <subject>
 
 <body>
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Type一覧**:
