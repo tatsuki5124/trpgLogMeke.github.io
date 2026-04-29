@@ -27,7 +27,6 @@ const filters: GrowthFilters = {
   },
   visibility: {
     tabName: true,
-    value: true,
     status: true,
   },
 }
@@ -98,7 +97,6 @@ describe('buildGrowthSummaryText', () => {
       },
       visibility: {
         tabName: false,
-        value: false,
         status: false,
       },
     }
@@ -108,7 +106,7 @@ describe('buildGrowthSummaryText', () => {
         メイン: true,
         雑談: false,
       })
-    ).toBe(['＜探索者A＞', '◯初期値成功', '目星'].join('\n'))
+    ).toBe(['＜探索者A＞', '◯初期値成功', '目星 ＞ 25'].join('\n'))
   })
 
   it('returns an empty string when no records remain visible', () => {

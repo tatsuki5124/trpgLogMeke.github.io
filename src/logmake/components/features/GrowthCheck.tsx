@@ -139,23 +139,6 @@ export function GrowthCheck({ analysis, tabs }: GrowthCheckProps) {
                     </label>
                     <label className={formStyles.checkboxLabel}>
                       <input
-                        checked={filters.visibility.value}
-                        type="checkbox"
-                        onChange={(event) => {
-                          const checked = event.currentTarget.checked
-                          setFilters((current) => ({
-                            ...current,
-                            visibility: {
-                              ...current.visibility,
-                              value: checked,
-                            },
-                          }))
-                        }}
-                      />
-                      出目
-                    </label>
-                    <label className={formStyles.checkboxLabel}>
-                      <input
                         checked={filters.visibility.status}
                         type="checkbox"
                         onChange={(event) => {
