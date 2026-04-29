@@ -147,6 +147,23 @@ trpgLogMeke.github.io/
 
 ### 2. コミット方針
 
+#### テストファースト原則（バグ修正・リファクタリング時）
+
+バグ修正・リファクタリング・セキュリティ修正は、**テストと実装を必ず同一コミットに含める**。
+
+手順：
+1. 失敗するテストを先に書く（期待する正しい動作を定義する）
+2. テストが通るように実装を変更する
+3. テスト＋実装を 1 コミットにまとめる
+
+`test:` だけのコミット、`fix:` だけのコミットに分けてはいけない。
+テストのない実装変更は「壊れていないか」を人間の目視確認に依存する状態になる。
+
+例外：
+- `docs:` ドキュメント更新 — テスト不要
+- `chore:` 依存関係変更・設定変更 — テスト不要
+- 新しい UI コンポーネントの初回実装 — 目視確認で代替可
+
 #### コミットメッセージ規約
 
 ```
@@ -154,9 +171,9 @@ trpgLogMeke.github.io/
 
 <body>
 
-🤖 Generated with [Codex](https://Codex.com/Codex)
+🤖 Generated with [Claude Code](https://claude.ai/code)
 
-Co-Authored-By: Codex <noreply@anthropic.com>
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Type一覧**:
@@ -322,7 +339,7 @@ main (本番)
 - React: https://react.dev/
 - Vite: https://vitejs.dev/
 - TypeScript: https://www.typescriptlang.org/
-- Zustand: https://docs.pmnd.rs/zustand/
+- Vitest: https://vitest.dev/
 
 ### GitHub
 
@@ -333,7 +350,7 @@ main (本番)
 
 ## 連絡事項
 
-### AI開発補助（Codex）の役割
+### AI開発補助（Claude Code）の役割
 
 - コード生成時に意味と意図を説明
 - Git操作の意味を解説

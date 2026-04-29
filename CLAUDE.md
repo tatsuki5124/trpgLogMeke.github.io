@@ -23,8 +23,8 @@ Vue.js (CDN版) で実装された TRPGログ整形ツール (`index_logmake.htm
 - **React**: 18.3.1
 - **TypeScript**: 5.6.3
 - **Vite**: 5.4.11（ビルドツール）
-- **Zustand**: 5.0.2（状態管理）
 - **Chart.js**: 4.4.7 + react-chartjs-2（グラフ表示）
+- **状態管理**: カスタムフック（Zustand は未使用・削除済み）
 
 ### 開発環境
 
@@ -146,6 +146,9 @@ trpgLogMeke.github.io/
 - テスタブルなコード構造
 
 ### 2. コミット方針
+
+**テストファースト原則**: バグ修正・リファクタリングはテストと実装を同一コミットに含める。
+詳細は AGENTS.md の「テストファースト原則」セクションを参照。
 
 #### コミットメッセージ規約
 
@@ -322,7 +325,7 @@ main (本番)
 - React: https://react.dev/
 - Vite: https://vitejs.dev/
 - TypeScript: https://www.typescriptlang.org/
-- Zustand: https://docs.pmnd.rs/zustand/
+- Vitest: https://vitest.dev/
 
 ### GitHub
 
