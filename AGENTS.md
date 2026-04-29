@@ -1,29 +1,41 @@
 # TRPG Log Maker
 
 CCFOLIA の HTML ログを解析・整形して配布用 HTML を生成するツール。CoC 6th/7th 対応。
-スタック・ディレクトリ構造は CLAUDE.md を参照。
 
 ---
 
-## コミット規約
+## 技術スタック
 
-形式: `<type>: <subject>`
-
-type: `feat` / `fix` / `refactor` / `docs` / `test` / `chore`
-
-**テストファースト原則**（バグ修正・リファクタリング時）:
-1. 失敗するテストを先に書く
-2. テストが通るように実装を変更する
-3. テスト＋実装を 1 コミットにまとめる（`fix:` だけ・`test:` だけに分けない）
-
-例外: `docs:` と `chore:` はテスト不要。
+- **React** 18.3.1 / **TypeScript** 5.6.3 / **Vite** 5.4.11
+- **Chart.js** 4.4.7 + react-chartjs-2 / 状態管理: カスタムフック（Zustand 不使用）
+- **テスト**: Vitest（ユニット）/ Playwright（E2E）/ **Node.js** 22 LTS / **pnpm** 10
 
 ---
 
-## ブランチ
+## ディレクトリ構造
 
-- 開発は `feature/react-migration` で実施
-- `main` へのマージは動作確認済みのみ（GitHub Pages 自動デプロイ）
+```
+src/
+├── main.tsx / App.tsx           # ランディングページ
+└── logmake/                     # ログ整形ツール本体
+    ├── types/                   # 全体共通の型定義
+    ├── systems/                 # ゲームシステム抽象層
+    │   ├── types.ts             # LogmakeSystem インターフェース
+    │   ├── index.ts / coc6.ts / coc7.ts
+    │   └── coc/                 # CoC 共通ロジック（ファクトリ）
+    │       └── data/            # defaultSkillValues6th/7th.json
+    ├── lib/                     # ビジネスロジック（React 非依存）
+    │   ├── parseLogHtml.ts      # ※DOMParser 依存のため例外
+    │   ├── analyzeGrowth.ts / buildOutputModel.ts
+    │   ├── buildOutputHtml.ts   # sanitizeCssColor() で色値を検証
+    │   ├── buildGrowthSummaryText.ts
+    │   └── utils/downloadFile.ts
+    ├── hooks/useLogmakePageState.ts  # 状態管理の中心
+    ├── components/features/     # UI コンポーネント
+    └── test/                    # ユニットテスト・フィクスチャ
+logmake/index.html               # logmake エントリ HTML
+legacy/                          # 移行前 Vue 版（参照用）
+```
 
 ---
 
@@ -39,10 +51,22 @@ pnpm lint         # ESLint
 
 ---
 
-## 設計原則
+## コミット規約
 
-- `src/logmake/lib/` はフレームワーク非依存のピュア関数（`parseLogHtml` のみ DOMParser 依存）
+形式: `<type>: <subject>` / type: `feat` / `fix` / `refactor` / `docs` / `test` / `chore`
+
+**テストファースト原則**（バグ修正・リファクタリング時）:
+1. 失敗するテストを先に書く
+2. テストが通るように実装を変更する
+3. テスト＋実装を 1 コミットにまとめる（`fix:` だけ・`test:` だけに分けない）
+
+例外: `docs:` と `chore:` はテスト不要。
+
+---
+
+## ブランチ・設計原則
+
+- 開発は `feature/react-migration` / `main` へのマージは動作確認済みのみ
+- `lib/` はフレームワーク非依存（`parseLogHtml` のみ DOMParser 依存）
 - ゲームシステムは `LogmakeSystem` インターフェース経由で抽象化（`systems/types.ts`）
-- 出力 HTML に埋め込む CSS カラー値は `sanitizeCssColor()` で検証してから使う
-- 状態管理は `useLogmakePageState` カスタムフックに集約（Zustand 不使用）
 - TypeScript strict mode・`any` 禁止
