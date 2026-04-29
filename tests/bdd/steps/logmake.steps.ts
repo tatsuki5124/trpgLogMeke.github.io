@@ -47,15 +47,14 @@ When('ログを整形する', async ({ page }) => {
   await page.getByTestId('display-sample').waitFor()
 })
 
-// 「成長ダイス表示を「なし/あり」」=「ダイス表示：」行のラベルチェックボックスを全 ON/OFF
-When('成長ダイス表示を「なし」に切り替える', async ({ page }) => {
-  await openGrowthDetails(page)
-  await setDiceLabels(page, false)
-})
-
-When('成長ダイス表示を「あり」に切り替える', async ({ page }) => {
-  await openGrowthDetails(page)
-  await setDiceLabels(page, true)
+When('成長技能チェックを開く', async ({ page }) => {
+  const details = page
+    .locator('details')
+    .filter({ has: page.locator('summary', { hasText: '成長技能チェック' }) })
+  const isOpen = await details.getAttribute('open')
+  if (isOpen === null) {
+    await page.getByText('成長技能チェック').click()
+  }
 })
 
 // -----------------------------------------------------------------------
@@ -92,20 +91,8 @@ Then('ダウンロードした HTML にキャラクター名「探索者A」が�
   }
 })
 
-// 全ラベルを OFF にすると growth-summary に ◯ラベル行が出ないことを確認
-Then('成長ダイスの結果は表示されない', async ({ page }) => {
-  await expect(page.getByTestId('growth-summary')).not.toContainText('◯')
-})
-
-// 全ラベルを OFF にしても成長技能チェックセクション自体は表示されていることを確認
-// （UI がクラッシュ・消滅していない）
-Then('キャラクターごとの成長判定結果は表示される', async ({ page }) => {
-  await expect(page.getByTestId('growth-summary')).toBeVisible()
-})
-
-// ラベルを ON にすると ◯ラベル行と出目値が表示されることを確認
-Then('成長ダイスの結果が表示される', async ({ page }) => {
-  await expect(page.getByTestId('growth-summary')).toContainText('◯')
+Then(/^成長サマリーに「(.+)」が表示されている$/, async ({ page }, expected: string) => {
+  await expect(page.getByTestId('growth-summary')).toContainText(expected)
 })
 
 // CoC7 の成功段階ラベルが growth-summary に表示されることを確認
@@ -113,34 +100,3 @@ Then('成長ダイスの結果が表示される', async ({ page }) => {
 Then(/^判定結果に「(.+)」が表示される$/, async ({ page }, expected: string) => {
   await expect(page.getByTestId('growth-summary')).toContainText(expected)
 })
-
-// -----------------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------------
-
-async function openGrowthDetails(page: Page) {
-  const details = page
-    .locator('details')
-    .filter({ has: page.locator('summary', { hasText: '成長技能チェック' }) })
-  const isOpen = await details.getAttribute('open')
-  if (isOpen === null) {
-    await page.getByText('成長技能チェック').click()
-  }
-}
-
-// 「ダイス表示：」行にある全ラベルチェックボックスを state に揃える
-async function setDiceLabels(page: Page, checked: boolean) {
-  const diceRow = page
-    .locator('tr')
-    .filter({ has: page.locator('th', { hasText: 'ダイス表示：' }) })
-  const checkboxes = diceRow.locator('input[type=checkbox]')
-  const count = await checkboxes.count()
-  for (let i = 0; i < count; i++) {
-    const cb = checkboxes.nth(i)
-    if (checked) {
-      await cb.check()
-    } else {
-      await cb.uncheck()
-    }
-  }
-}
