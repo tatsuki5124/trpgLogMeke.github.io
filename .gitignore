@@ -11,6 +11,7 @@ package-lock.json
 # AI補助ツールが作る一時 worktree・個人設定（settings.json のみ追跡）
 .claude/*
 !.claude/settings.json
+!.claude/skills/
 
 # ====================
 # ビルド成果物
@@ -88,6 +89,13 @@ playwright-report/
 # ====================
 # 個人の学習記録のため、リポジトリには含めない
 knowledge/
+
+# ====================
+# BDD テスト生成ファイル
+# ====================
+# bddgen が生成するテストコード（.feature から自動生成）
+.features-gen/
+pochi-feed.md
 
 # ====================
 # 一時ファイル

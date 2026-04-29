@@ -71,6 +71,26 @@ pnpm lint         # ESLint
 - ゲームシステムは `LogmakeSystem` インターフェース経由で抽象化（`systems/types.ts`）
 - TypeScript strict mode・`any` 禁止
 
+## テスト戦略（3層）
+
+| 層   | ツール              | 対象                            | 場所                             |
+| ---- | ------------------- | ------------------------------- | -------------------------------- |
+| BHV  | playwright-bdd      | E2E ユーザーシナリオ（Gherkin） | specs/features/                  |
+| INV  | fast-check + vitest | 純粋関数の不変条件              | src/logmake/test/properties/     |
+| ERR  | AGENTS.md 文書化    | 意図的な挙動・実装上の注意点    | このファイル（既知の注意点欄）   |
+
+新機能は `.feature` を先に書き、`pnpm bddgen` で失敗確認してから実装する。
+`specs/features/` が正規の仕様ドキュメント。`tests/bdd/steps/` がテスト実装。
+
+```bash
+pnpm bddgen          # .feature からテストコード生成
+pnpm test:bdd        # BDD シナリオ実行
+pnpm test:unit       # ユニットテスト + プロパティテスト
+pnpm test:all        # 全テスト
+```
+
+---
+
 ## 既知の設計上の注意点
 
 - **`renderToken` の `token.content` はエスケープしない（意図的）**
@@ -80,3 +100,7 @@ pnpm lint         # ESLint
 
 - **`parseLogHtml` はブラウザ専用**（`DOMParser` 依存）
   Node.js 環境でテストする場合は jsdom が必要（vitest.config の `environment: 'jsdom'` で対応済み）。
+
+- **`escapeText` は呼び出し回数だけエスケープを適用する（冪等でない）**
+  生ログテキストのみに適用すること。すでにエスケープ済みの文字列への重複適用は呼び出し側が避ける。
+  `escapeText` は `src/logmake/lib/htmlUtils.ts` に独立モジュールとして配置されている。

@@ -22,7 +22,10 @@
     "test": "pnpm test:unit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "bddgen": "bddgen",
+    "test:bdd": "pnpm bddgen && playwright test --project=bdd",
+    "test:all": "pnpm test:unit && pnpm test:bdd"
   },
   "dependencies": {
     "chart.js": "^4.4.7",
@@ -45,8 +48,10 @@
     "eslint-plugin-jsdoc": "^62.9.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
+    "fast-check": "^4.7.0",
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",
+    "playwright-bdd": "^8.5.0",
     "prettier": "^3.7.4",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
