@@ -47,7 +47,7 @@ export function buildVisualComparisonOutputModel(
     }
   }
 
-  return useStableComparisonTabClasses(
+  return applyStableComparisonTabClasses(
     buildOutputModel(parsedLog, {
       tabs: parsedLog.tabs,
       characters,
@@ -55,7 +55,7 @@ export function buildVisualComparisonOutputModel(
   )
 }
 
-function useStableComparisonTabClasses(outputModel: OutputModel): OutputModel {
+function applyStableComparisonTabClasses(outputModel: OutputModel): OutputModel {
   const classByTabName = new Map<string, string>()
   let index = 0
 
