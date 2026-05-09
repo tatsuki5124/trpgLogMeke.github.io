@@ -46,6 +46,7 @@ export const COC6_SYSTEM: LogmakeSystem = {
   id: 'CoC6',
   name: 'CoC 6版',
   log: {
+    normalizeSpeaker: normalizeCocSpeaker,
     normalizeSource: createLogSourceNormalizer({
       multiRollRegex:
         /(?:x|rep|repeat)\d+( |\u3000)(CCB|CC|RESB|RES|CBRB|CBR)(.*)\s+#\d+\n(.*)(\n\n+#\d+\n(.*))+(クリティカル|決定的成功|スペシャル|成功|失敗|ファンブル|致命的失敗)/gi,
@@ -55,4 +56,15 @@ export const COC6_SYSTEM: LogmakeSystem = {
     parseToken: parseCoc6DiceToken,
   },
   growth: coc6Growth,
+}
+
+function normalizeCocSpeaker(speakerName: string) {
+  const name = speakerName.trim()
+  if (name === '') {
+    return { name: '話者なし', displayName: null, defaultStyle: 'scene' as const }
+  }
+  if (/^(KP|GM)$/i.test(name)) {
+    return { name, displayName: null, defaultStyle: 'scene' as const }
+  }
+  return { name, displayName: name }
 }

@@ -34,7 +34,7 @@ function App() {
         <h1 className={styles.title}>ログ整形</h1>
       </header>
 
-      <div className={styles.box5}>
+      <div className={styles.pageFrame}>
         <FileUpload
           sourceFileName={source.fileName}
           system={system}

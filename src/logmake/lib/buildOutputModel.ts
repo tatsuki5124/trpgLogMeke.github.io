@@ -43,6 +43,9 @@ export function buildOutputModel(
       color: entry.charColor,
       style: 'item' as const,
     }
+    const displayName =
+      entry.displayName === undefined ? entry.charName : entry.displayName
+    const style = entry.displayName === null ? ('scene' as const) : character.style
 
     let currentSection = sections[sections.length - 1]
     if (!currentSection || currentSection.tabName !== entry.tabName) {
@@ -57,11 +60,17 @@ export function buildOutputModel(
 
     let currentSpeaker =
       currentSection.entries[currentSection.entries.length - 1]
-    if (!currentSpeaker || currentSpeaker.charName !== entry.charName) {
+    if (
+      !currentSpeaker ||
+      currentSpeaker.charName !== entry.charName ||
+      currentSpeaker.displayName !== displayName ||
+      currentSpeaker.style !== style
+    ) {
       currentSpeaker = {
         charName: entry.charName,
+        displayName,
         color: character.color,
-        style: character.style,
+        style,
         paragraphs: [],
       }
       currentSection.entries.push(currentSpeaker)
@@ -84,7 +93,7 @@ function createTabVisibilityClasses(
       continue
     }
 
-    classes[tab.name] = `logmake-tab-${index}`
+    classes[tab.name] = `log-tab-${index}`
     index += 1
   }
 

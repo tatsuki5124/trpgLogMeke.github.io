@@ -105,6 +105,8 @@ export interface ParsedLogEntry {
   id: string
   tabName: string
   charName: string
+  /** 出力 HTML で表示する名前。null の場合は話者名を表示しない */
+  displayName?: string | null
   charColor: string
   sourceHtml: string
   paragraphs: ContentParagraph[]
@@ -161,6 +163,8 @@ export interface GrowthFilters {
 /** 出力 HTML におけるひとりのキャラクターの発言ブロック */
 export interface OutputSpeakerEntry {
   charName: string
+  /** 出力 HTML で表示する名前。null の場合は話者名を表示しない */
+  displayName?: string | null
   color: string
   style: CharacterStyle
   paragraphs: ContentParagraph[]

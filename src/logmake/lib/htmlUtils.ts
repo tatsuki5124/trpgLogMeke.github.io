@@ -15,6 +15,77 @@ export function escapeText(text: string): string {
     .replaceAll("'", '&#39;')
 }
 
+const ALLOWED_CONTENT_TAGS = new Set([
+  'b',
+  'strong',
+  'i',
+  'em',
+  'u',
+  's',
+  'span',
+  'ruby',
+  'rt',
+  'rp',
+  'br',
+])
+
+const DROP_CONTENT_TAGS = new Set([
+  'script',
+  'style',
+  'iframe',
+  'object',
+  'embed',
+  'svg',
+  'math',
+])
+
+/**
+ * CCFOLIA の発言本文 HTML を許可リスト方式で安全化する。
+ * 軽いインライン書式は残すが、属性と危険タグは出力しない。
+ *
+ * @param html - CCFOLIA 由来の本文 HTML フラグメント
+ * @returns 安全化済み HTML フラグメント
+ */
+export function sanitizeContentHtml(html: string): string {
+  const document = new DOMParser().parseFromString(
+    `<template>${html}</template>`,
+    'text/html',
+  )
+  const template = document.querySelector('template')
+  if (!template) {
+    return escapeText(html)
+  }
+
+  return Array.from(template.content.childNodes).map(sanitizeNode).join('')
+}
+
+function sanitizeNode(node: Node): string {
+  if (node.nodeType === 3) {
+    return escapeText(node.textContent ?? '')
+  }
+
+  if (node.nodeType !== 1) {
+    return ''
+  }
+
+  const element = node as Element
+  const tagName = element.tagName.toLowerCase()
+  if (DROP_CONTENT_TAGS.has(tagName)) {
+    return ''
+  }
+
+  const children = Array.from(element.childNodes).map(sanitizeNode).join('')
+  if (!ALLOWED_CONTENT_TAGS.has(tagName)) {
+    return children
+  }
+
+  if (tagName === 'br') {
+    return '<br>'
+  }
+
+  return `<${tagName}>${children}</${tagName}>`
+}
+
 export const SAFE_HEX_COLOR = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/
 export const SAFE_RGBA_COLOR = /^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/
 

@@ -17,7 +17,7 @@ const COLOR_STYLE_REGEX = /(?:^|;)\s*color\s*:\s*(#[0-9a-fA-F]{6})\s*(?:;|$)/
 interface RawLogEntry {
   color: string
   rawTabName: string
-  charName: string
+  rawSpeakerName: string
   rawContent: string
 }
 
@@ -36,9 +36,14 @@ export function parseLogHtml(rawHtml: string, system: LogmakeSystem): ParsedLog 
   const characterOrder: string[] = []
   const characterSeenCount: Record<string, number> = {}
   const characterColors: Record<string, string> = {}
+  const characterDefaultStyles: Partial<
+    Record<string, CharacterConfig['style']>
+  > = {}
 
   for (const [index, entry] of readRawEntries(rawHtml).entries()) {
-    const { color, rawTabName, charName, rawContent } = entry
+    const { color, rawTabName, rawSpeakerName, rawContent } = entry
+    const speaker = normalizeSpeaker(rawSpeakerName, system)
+    const charName = speaker.name
     const tabName = getTabDisplayName(rawTabName.trim())
     const normalizedContent = system.log.normalizeSource(rawContent)
 
@@ -53,11 +58,15 @@ export function parseLogHtml(rawHtml: string, system: LogmakeSystem): ParsedLog 
 
     characterSeenCount[charName] += 1
     characterColors[charName] = color
+    if (speaker.defaultStyle) {
+      characterDefaultStyles[charName] = speaker.defaultStyle
+    }
 
     entries.push({
       id: `${tabName}-${charName}-${index}`,
       tabName,
       charName,
+      displayName: speaker.displayName,
       charColor: color,
       sourceHtml: normalizedContent,
       paragraphs: parseParagraphs(normalizedContent, system),
@@ -76,7 +85,9 @@ export function parseLogHtml(rawHtml: string, system: LogmakeSystem): ParsedLog 
         name: charName,
         color: characterColors[charName],
         // 2回以上登場するキャラクターを PC（character）として扱う
-        style: characterSeenCount[charName] > 1 ? 'character' : 'item',
+        style:
+          characterDefaultStyles[charName] ??
+          (characterSeenCount[charName] > 1 ? 'character' : 'item'),
       }
       return result
     },
@@ -122,17 +133,17 @@ function readRawEntry(paragraph: HTMLParagraphElement): RawLogEntry | null {
   }
 
   const rawTabName = readTabName(spans[0].textContent ?? '')
-  const charName = (spans[1].textContent ?? '').trim()
+  const rawSpeakerName = spans[1].textContent ?? ''
   const rawContent = spans[2].innerHTML.trim()
 
-  if (!rawTabName || !charName || !rawContent) {
+  if (!rawTabName || !rawContent) {
     return null
   }
 
   return {
     color,
     rawTabName,
-    charName,
+    rawSpeakerName,
     rawContent,
   }
 }
@@ -166,6 +177,25 @@ function readSpeakerColor(paragraph: HTMLParagraphElement): string | null {
 function readTabName(tabLabel: string): string {
   const trimmed = tabLabel.trim()
   return (trimmed.match(/^\[(.*)\]$/s)?.[1] ?? trimmed).trim()
+}
+
+function normalizeSpeaker(
+  speakerName: string,
+  system: LogmakeSystem,
+): {
+  name: string
+  displayName: string | null
+  defaultStyle?: CharacterConfig['style']
+} {
+  const normalized = system.log.normalizeSpeaker?.(speakerName)
+  if (normalized) {
+    return normalized
+  }
+  const name = speakerName.trim()
+  return {
+    name,
+    displayName: name,
+  }
 }
 
 /**

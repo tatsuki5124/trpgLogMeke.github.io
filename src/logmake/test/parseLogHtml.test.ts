@@ -66,6 +66,37 @@ describe('parseLogHtml', () => {
     })
   })
 
+  it('CoC logs keep KP and blank speakers internally while marking them as narration', () => {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="ja">
+        <body>
+          <p style="color:#3366cc;">
+            <span>[main]</span><span>KP</span> :
+            <span>扉の向こうから物音がする。</span>
+          </p>
+          <p style="color:#3366cc;">
+            <span>[main]</span><span>   </span> :
+            <span>話者なしの地の文。</span>
+          </p>
+        </body>
+      </html>
+    `
+    const parsed = parseLogHtml(html, COC6_SYSTEM)
+    const first = parsed.entries[0] as { displayName: string | null }
+    const second = parsed.entries[1] as { displayName: string | null }
+
+    expect(parsed.entries).toHaveLength(2)
+    expect(parsed.entries.map((entry) => entry.charName)).toEqual([
+      'KP',
+      '話者なし',
+    ])
+    expect(first.displayName).toBeNull()
+    expect(second.displayName).toBeNull()
+    expect(parsed.characters.KP?.style).toBe('scene')
+    expect(parsed.characters['話者なし']?.style).toBe('scene')
+  })
+
   it('returns a warning when no CCFOLIA log entries are found', () => {
     const parsed = parseLogHtml(
       '<html><body><p>no log</p></body></html>',

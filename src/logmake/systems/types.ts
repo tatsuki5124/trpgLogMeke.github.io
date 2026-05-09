@@ -1,5 +1,6 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
 import type {
+  CharacterStyle,
   DiceEvent,
   DiceEventTarget,
   GameSystem,
@@ -24,6 +25,16 @@ export interface GrowthCapability {
   isGrowthTarget(dice: DiceEvent): boolean
 }
 
+/** ログ内の話者名をシステム固有ルールで正規化した結果 */
+export interface NormalizedSpeaker {
+  /** 内部集計・設定で使用する名前 */
+  name: string
+  /** 出力 HTML で表示する名前。null の場合は話者名を表示しない */
+  displayName: string | null
+  /** ログ読込時に使う表示スタイルの初期値 */
+  defaultStyle?: CharacterStyle
+}
+
 /**
  * ゲームシステムの解析・成長判定機能を束ねるインターフェース。
  * 各システムはこれを実装した定数として systems/ に定義される。
@@ -33,6 +44,7 @@ export interface LogmakeSystem {
   name: string
   log: {
     normalizeSource(content: string): string
+    normalizeSpeaker?(speakerName: string): NormalizedSpeaker
     parseToken(fragment: string): DiceEvent | undefined
   }
   growth?: GrowthCapability

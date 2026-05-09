@@ -54,7 +54,7 @@
   font-size: clamp(2rem, 3vw, 2.5rem);
 }
 
-.box5 {
+.pageFrame {
   padding: 1.5rem;
   margin: 1rem;
   border: double 5px var(--clr-border);
@@ -132,7 +132,7 @@
     padding: 0.5rem 1rem 0;
   }
 
-  .box5 {
+  .pageFrame {
     margin: 0.5rem;
     padding: 1rem;
   }

@@ -137,11 +137,11 @@ describe('buildOutputModel', () => {
       {
         name: '雑談 "quote"',
         color: '#123456',
-        inputId: 'logmake-tab-0-toggle',
-        tabVisibilityClass: 'logmake-tab-0',
+        inputId: 'log-tab-0-toggle',
+        tabVisibilityClass: 'log-tab-0',
       },
     ])
-    expect(model.sections[0].tabVisibilityClass).toBe('logmake-tab-0')
+    expect(model.sections[0].tabVisibilityClass).toBe('log-tab-0')
     expect(model.sections[0].tabVisibilityClass).not.toContain('雑談')
   })
 })

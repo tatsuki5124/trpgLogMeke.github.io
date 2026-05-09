@@ -27,47 +27,61 @@ export function DisplaySample({ compact = false }: { compact?: boolean }) {
           </button>
         </div>
         <div className={formStyles.growthBox} data-testid="display-sample">
-          <div
-            className={formStyles.charBlock}
-            style={{ color: 'rgb(30, 144, 255)' }}
-          >
-            <b className={formStyles.charName}>キャラクタ名</b>
-            <p className={formStyles.paragraph}>
-              <span>人物を選ぶとこんな感じで表示されます</span>
-              <br />
-            </p>
+          <div className={formStyles.sampleLogEntrySpeaker}>
+            <span
+              className={formStyles.sampleLogSpeaker}
+              style={{ color: 'rgb(30, 144, 255)' }}
+            >
+              キャラクタ名
+            </span>
+            <div className={formStyles.sampleLogMessages}>
+              <p className={formStyles.sampleLogMessage}>
+                <span>人物を選ぶとこんな感じで表示されます</span>
+                <br />
+              </p>
+            </div>
           </div>
 
-          <div className={formStyles.itemBlock}>
-            <span className={formStyles.itemTitle}>アイテム名</span>
-            <p className={formStyles.itemParagraph}>
-              <span>情報を選ぶとこんな感じで表示されます</span>
-              <br />
-            </p>
+          <div className={formStyles.sampleLogEntryInfo}>
+            <h4 className={formStyles.sampleLogInfoTitle}>アイテム名</h4>
+            <div className={formStyles.sampleLogMessages}>
+              <p className={formStyles.sampleLogInfoMessage}>
+                <span>情報を選ぶとこんな感じで表示されます</span>
+                <br />
+              </p>
+            </div>
           </div>
 
-          <p className={formStyles.sceneName} style={{ color: 'rgb(112, 112, 112)' }}>
-            場面名（KPなど）
-          </p>
-          <p className={formStyles.paragraph}>
-            <span>場面を選ぶとこんな感じで表示されます</span>
-            <br />
-          </p>
+          <div className={formStyles.sampleLogEntryScene}>
+            <h3 className={formStyles.sampleLogScene} style={{ color: 'rgb(112, 112, 112)' }}>
+              場面名（KPなど）
+            </h3>
+            <div className={formStyles.sampleLogMessages}>
+              <p className={formStyles.sampleLogMessage}>
+                <span>場面を選ぶとこんな感じで表示されます</span>
+                <br />
+              </p>
+            </div>
+          </div>
 
           <div
-            className={formStyles.sampleTab}
+            className={formStyles.sampleLogTabSection}
             style={{ borderLeft: '3px solid rgb(211, 13, 13)' }}
           >
-            <div
-              className={formStyles.charBlock}
-              style={{ color: 'rgb(50, 150, 50)' }}
-            >
-              <b className={formStyles.charName}>キャラクタ名</b>
-              <p className={formStyles.paragraph}>
-                <span>
-                  メインと情報以外のタブはこんな感じ（左側のラインの色が選択できます）
-                </span>
-              </p>
+            <div className={formStyles.sampleLogEntrySpeaker}>
+              <span
+                className={formStyles.sampleLogSpeaker}
+                style={{ color: 'rgb(50, 150, 50)' }}
+              >
+                キャラクタ名
+              </span>
+              <div className={formStyles.sampleLogMessages}>
+                <p className={formStyles.sampleLogMessage}>
+                  <span>
+                    メインと情報以外のタブはこんな感じ（左側のラインの色が選択できます）
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
         </div>

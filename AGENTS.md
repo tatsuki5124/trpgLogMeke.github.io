@@ -95,10 +95,10 @@ pnpm test:all        # 全テスト
 
 ## 既知の設計上の注意点
 
-- **`renderToken` の `token.content` はエスケープしない（意図的）**
-  CCFOLIA の innerHTML をそのまま出力 HTML に通している。
-  `escapeText()` を適用すると CCFOLIA のインライン書式（`<b>` 等）が壊れる。
-  将来「セキュリティ修正」として誤ってエスケープを追加しないこと。
+- **本文の `token.content` は allowlist sanitizer を通す**
+  CCFOLIA のインライン書式（`<b>` 等）を残すため、本文全体に `escapeText()` を直接適用しない。
+  出力 HTML に通す前に `sanitizeContentHtml()` で許可タグだけを残し、危険タグ・属性を除去する。
+  将来「セキュリティ修正」として全エスケープに置き換えないこと。
 
 - **`parseLogHtml` はブラウザ専用**（`DOMParser` 依存）
   Node.js 環境でテストする場合は jsdom が必要（vitest.config の `environment: 'jsdom'` で対応済み）。

@@ -268,7 +268,7 @@ export function useLogmakePageState() {
     }
 
     const html = buildOutputHtml(outputModel, settings)
-    const blob = new Blob([html], { type: 'text/html' })
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
     downloadFile(blob, `${settings.logFileName || 'log'}.html`)
   }
 
