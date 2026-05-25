@@ -81,6 +81,25 @@ describe('buildOutputHtml', () => {
     expect(output).not.toContain('タブ&lt;&quot;quoted&quot;&gt; tab')
   })
 
+  it('adds the legacy tab class and visibility class to auxiliary tab sections', () => {
+    const model: OutputModel = {
+      sections: [
+        {
+          tabName: '雑談',
+          tabColor: '#ff0000',
+          tabVisibilityClass: 'logmake-tab-0',
+          entries: [],
+        },
+      ],
+      toggles: [],
+    }
+    const output = buildOutputHtml(model, createDefaultSettings('test'))
+
+    expect(output).toContain(
+      '<div class="tab logmake-tab-0" style="border-left: 3px solid #ff0000;">'
+    )
+  })
+
   it('inserts valid hex color values into style attributes unchanged', () => {
     const emptyModel: OutputModel = { sections: [], toggles: [] }
     const output = buildOutputHtml(emptyModel, {
@@ -167,6 +186,7 @@ describe('buildOutputHtml', () => {
     })
 
     expect(output).toContain('writing-mode: vertical-rl')
+    expect(output).toContain('class="tab logmake-tab-0"')
     expect(output).toContain('border-top: 3px solid #ff0000')
     expect(output).toContain(
       'linear-gradient(to right, #7fbfff 50%, transparent 50%)'
@@ -201,6 +221,7 @@ describe('buildOutputHtml', () => {
     }
     const output = buildOutputHtml(model, { ...createDefaultSettings('test'), darkMode: true })
 
+    expect(output).toContain('class="tab logmake-tab-0"')
     expect(output).toContain('rgba(200,200,200,0.06)')
     expect(output).not.toContain('rgba(127,127,127,0.1)')
   })

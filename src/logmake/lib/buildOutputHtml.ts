@@ -76,7 +76,7 @@ ${entry.paragraphs.map(renderParagraph).join('\n')}`
   function renderSection(section: OutputSection): string {
     const className = isPrimaryTab(section.tabName)
       ? 'mainBlock'
-      : section.tabVisibilityClass
+      : `tab ${section.tabVisibilityClass}`
 
     const style = isPrimaryTab(section.tabName)
       ? ''
