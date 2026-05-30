@@ -40,7 +40,6 @@ try {
     { getLogmakeSystem },
     {
       buildCandidateCombinedComparisonHtml,
-      buildLegacyComparisonHtml,
       buildSpeakerAfterLineComparisonHtml,
       buildSpeakerBodyGuideComparisonHtml,
       buildVisualComparisonOutputModel,
@@ -60,7 +59,6 @@ try {
   const darkSettings = { ...lightSettings, darkMode: true }
   const renderers = {
     buildCandidateCombinedComparisonHtml,
-    buildLegacyComparisonHtml,
     buildSpeakerAfterLineComparisonHtml,
     buildSpeakerBodyGuideComparisonHtml,
   }
@@ -97,21 +95,11 @@ async function removeGeneratedHtmlFiles(targetDir) {
 function createVariants(renderers, outputModel, themeId, themeLabel, baseSettings) {
   const {
     buildCandidateCombinedComparisonHtml,
-    buildLegacyComparisonHtml,
     buildSpeakerAfterLineComparisonHtml,
     buildSpeakerBodyGuideComparisonHtml,
   } = renderers
   const suffix = themeId === 'light' ? '' : '-dark'
   return [
-    {
-      fileName: `legacy${suffix}.html`,
-      label: '旧表示',
-      themeLabel,
-      html: buildLegacyComparisonHtml(outputModel, {
-        ...baseSettings,
-        title: `ログ出力比較 - ${themeLabel} - 旧表示`,
-      }),
-    },
     {
       fileName: `speaker-after-line${suffix}.html`,
       label: '名前後ろライン',

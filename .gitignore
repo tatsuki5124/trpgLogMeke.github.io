@@ -8,11 +8,6 @@ node_modules/
 # npm lockfile (pnpm移行後は不要)
 package-lock.json
 
-# AI補助ツールが作る一時 worktree・個人設定（settings.json のみ追跡）
-.claude/*
-!.claude/settings.json
-!.claude/skills/
-
 # ====================
 # ビルド成果物
 # ====================
@@ -20,15 +15,6 @@ package-lock.json
 dist/
 dist-ssr/
 *.local
-
-# ====================
-# エディタ・IDE設定
-# ====================
-# 個人の開発環境固有の設定のため共有不要
-# VSCode
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
 
 # JetBrains (WebStorm, IntelliJ等)
 .idea/

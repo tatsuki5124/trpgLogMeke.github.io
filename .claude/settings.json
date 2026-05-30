@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "allow": ["Bash(pnpm run lint)", "Bash(pnpm test *)"]
+    "allow": [
+      "Bash(pnpm run lint)",
+      "Bash(pnpm test *)"
+    ]
   },
   "hooks": {
     "PostToolUse": [
@@ -29,5 +32,8 @@
         ]
       }
     ]
+  },
+  "worktree": {
+    "bgIsolation": "none"
   }
 }

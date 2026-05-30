@@ -72,14 +72,17 @@
     margin: 0;
     padding: .5rem;
     text-align: left;
+  }
+  .log-message,
+  .log-section-tab-name,
+  .log-info-title,
+  .log-speaker,
+  .log-scene {
     word-break: normal;
     word-break: auto-phrase;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
   .log-section {
-    position: relative;
-  }
-  .log-section--primary {
     position: relative;
   }
   .log-section--tab {
@@ -104,9 +107,6 @@
     pointer-events: none;
     text-align: right;
     writing-mode: horizontal-tb;
-    word-break: normal;
-    word-break: auto-phrase;
-    overflow-wrap: anywhere;
   }
   .log-section-title {
     position: absolute;
@@ -119,11 +119,12 @@
     white-space: nowrap;
     border: 0;
   }
+  /* logmake visual comparison: shared structured layout. */
   .log-entry--info {
     position: relative;
-    margin: 2.5rem 1.25rem;
+    margin: 1.75rem 1.25rem 1.5rem;
     padding: 1rem 1.5rem .5rem 1rem;
-    border: solid 3px #888888;
+    border: solid 3px #a8a8a8;
     border-radius: 8px;
     background: #2d2d2d;
     line-height: 1.5;
@@ -131,52 +132,53 @@
   .log-info-title {
     position: absolute;
     display: inline-block;
-    top: -2.5rem;
+    top: -0.6rem;
     left: .5rem;
     right: auto;
-    padding: .5rem;
+    margin: 0;
+    padding: 0 .45rem;
     line-height: 1;
     background: #2d2d2d;
-    color: #888888;
+    color: #a8a8a8;
     font-weight: bold;
     font-size: 1rem;
-    word-break: normal;
-    word-break: auto-phrase;
-    overflow-wrap: anywhere;
   }
   .log-entry--info .log-message {
     margin: 0;
-    color: #888888;
+    color: #a8a8a8;
+  }
+  .log-section--tab .log-entry--info {
+    margin: 1.1rem .75rem .95rem;
   }
   .log-speaker {
     display: block;
     color: var(--log-speaker-color);
     font-weight: bold;
-    word-break: normal;
-    word-break: auto-phrase;
-    overflow-wrap: anywhere;
   }
   .log-entry--speaker {
-    margin: 1.5rem 1rem 1.5rem 0.5rem;
+    margin: 1.7rem 1rem 1.7rem .5rem;
   }
   .log-entry--speaker .log-message {
-    color: var(--log-speaker-color);
+    padding-block: .25rem;
+    color: #d0d0d0;
   }
   .log-scene {
-    margin: 0 0 0.25rem .5rem;
+    margin: 2rem 0 .65rem .5rem;
     color: var(--log-speaker-color);
-    word-break: normal;
-    word-break: auto-phrase;
-    overflow-wrap: anywhere;
+  }
+  .log-entry--scene .log-message {
+    color: #b8b8b8;
   }
   .log-entry--narration {
-    margin: 1rem 1.25rem;
-    color: #d0d0d0;
-    opacity: .9;
+    margin: .65rem 1rem .65rem .5rem;
+    color: #b8b8b8;
+    opacity: 1;
   }
   .log-entry--narration .log-message {
-    padding-inline-start: 1rem;
-    border-inline-start: 2px solid rgba(127,127,127,0.35);
+    padding-block: .25rem;
+    padding-inline: 0 .5rem;
+    border-inline-start: 0;
+    color: #b8b8b8;
   }
   @media screen and (max-width: 480px){
     html {
@@ -205,10 +207,6 @@
   }
   
   
-  /* logmake visual comparison: keep speaker names colored, but read body text in the base color. */
-  .log-entry--speaker .log-message {
-    color: #d0d0d0;
-  }
   /* logmake visual comparison: speaker name after-line marker. */
   .log-entry--speaker .log-speaker {
     display: inline-flex;
@@ -265,21 +263,21 @@
 </p>
 </div>
 </div>
-<div class="log-entry log-entry--scene log-entry--narration">
+<div class="log-entry log-entry--scene log-entry--narration log-entry--nameless-narration">
     <div class="log-messages">
     <p class="log-message">
     <span>雨音が強くなり、廊下の奥から古い木材がきしむ音が聞こえます。</span>
 </p>
 </div>
 </div>
-<div class="log-entry log-entry--scene log-entry--narration">
+<div class="log-entry log-entry--scene log-entry--narration log-entry--nameless-narration">
     <div class="log-messages">
     <p class="log-message">
     <span>ここから先は、探索者たちが選んだ順番に処理していきます。</span>
 </p>
 </div>
 </div>
-<div class="log-entry log-entry--scene log-entry--narration">
+<div class="log-entry log-entry--scene log-entry--narration log-entry--nameless-narration">
     <div class="log-messages">
     <p class="log-message">
     <span>話者なしの描写です。名前を出さない地の文として、会話より少し控えめに読めるかを確認します。</span>
@@ -314,7 +312,7 @@
     <span class="log-speaker">探索者A</span>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, #7fbfff 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
+    <span style="background: linear-gradient(transparent 70%, rgba(127, 191, 255, 0.56) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
 </p>
 </div>
 </div>
@@ -364,7 +362,7 @@
     <span class="log-speaker">探索者B</span>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, #ff7f7f 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
+    <span style="background: linear-gradient(transparent 70%, rgba(255, 127, 127, 0.58) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
 </p>
 <p class="log-message">
     <span>

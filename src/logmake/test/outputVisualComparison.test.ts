@@ -7,8 +7,8 @@ import { createDefaultSettings } from '@/logmake/lib/defaults'
 import { parseLogHtml } from '@/logmake/lib/parseLogHtml'
 import { getLogmakeSystem } from '@/logmake/systems'
 import {
+  buildCandidateColoredBodyComparisonHtml,
   buildCandidateCombinedComparisonHtml,
-  buildLegacyComparisonHtml,
   buildSpeakerAfterLineComparisonHtml,
   buildSpeakerBodyGuideComparisonHtml,
   buildVisualComparisonOutputModel,
@@ -83,9 +83,9 @@ describe('output visual comparison helpers', () => {
   it('renders the trimmed comparison variants from the same model', () => {
     const outputModel = buildComparisonModel()
     const settings = createDefaultSettings('comparison')
-    const legacy = buildLegacyComparisonHtml(outputModel, {
+    const coloredBody = buildCandidateColoredBodyComparisonHtml(outputModel, {
       ...settings,
-      title: '旧表示',
+      title: '発言色付き統合案',
     })
     const afterLine = buildSpeakerAfterLineComparisonHtml(outputModel, {
       ...settings,
@@ -100,38 +100,75 @@ describe('output visual comparison helpers', () => {
       title: '統合候補',
     })
 
-    expect(legacy).toContain('<div class="box5">')
-    expect(legacy).toContain('<div class="char" style="color: #228b22;">')
-    expect(legacy).toContain('<div class="tab log-tab-0"')
-    expect(legacy).toContain('padding: .5rem .75rem;')
-    expect(legacy).not.toContain('padding: .5rem 1.5rem .5rem 1rem;')
+    for (const structuredHtml of [
+      coloredBody,
+      afterLine,
+      bodyGuide,
+      candidate,
+    ]) {
+      expect(structuredHtml).toContain('shared structured layout')
+      expect(structuredHtml).toContain('margin: 1.7rem 1rem 1.7rem .5rem;')
+      expect(structuredHtml).toContain('padding-block: .25rem;')
+      expect(structuredHtml).toContain('margin: 2rem 0 .65rem .5rem;')
+      expect(structuredHtml).toContain(
+        '.log-entry--scene .log-message {\n    color: #555555;',
+      )
+      expect(structuredHtml).toContain('margin: .65rem 1rem .65rem .5rem;')
+      expect(structuredHtml).toContain('padding-inline: 0 .5rem;')
+      expect(structuredHtml).toContain('border-inline-start: 0;')
+      expect(structuredHtml).toContain('margin: 1.75rem 1.25rem 1.5rem;')
+      expect(structuredHtml).toContain('border: solid 3px #707070;')
+      expect(structuredHtml).toContain('margin: 1.1rem .75rem .95rem;')
+      expect(structuredHtml).not.toContain('compact tab content spacing')
+      expect(structuredHtml).not.toContain('padding-block: 1rem .75rem;')
+      expect(structuredHtml).toContain('overflow-wrap: break-word;')
+      expect(structuredHtml).toContain('word-break: auto-phrase;')
+    }
+
+    for (const baseBodyHtml of [afterLine, bodyGuide, candidate]) {
+      expect(baseBodyHtml).toContain('color: #333333;')
+      expect(baseBodyHtml).not.toContain('speaker body character color')
+    }
+
+    expect(coloredBody).toContain('speaker body character color')
+    expect(coloredBody).toContain('color: var(--log-speaker-color);')
+    expect(coloredBody).toContain('<span class="log-speaker">KP</span>')
+    expect(coloredBody).toContain('<span class="log-speaker">GM</span>')
+    expect(coloredBody).toContain('<span class="log-speaker">話者なし</span>')
+    expect(coloredBody).not.toContain('log-entry--nameless-narration')
+    expect(coloredBody).not.toContain('nameless narration guide marker')
+    expect(coloredBody).not.toContain('speaker name after-line marker')
+    expect(coloredBody).not.toContain('speaker name underline marker')
+    expect(coloredBody).not.toContain('speaker body guide marker')
+    for (const narrationHtml of [afterLine, bodyGuide, candidate]) {
+      expect(narrationHtml).toContain('log-entry--nameless-narration')
+      expect(narrationHtml).not.toContain('nameless narration guide marker')
+    }
     expect(afterLine).toContain('speaker name after-line marker')
-    expect(afterLine).toContain(
-      'keep speaker names colored, but read body text in the base color',
-    )
     expect(afterLine).toContain('display: inline-flex;')
     expect(afterLine).toContain('flex: 0 0 clamp(2rem, 8vw, 4.5rem);')
     expect(afterLine).toContain(
       'border-block-start: 2px solid var(--log-speaker-color);',
     )
+    expect(afterLine).not.toContain('speaker body guide marker')
+    expect(afterLine).not.toContain('speaker name underline marker')
     expect(bodyGuide).toContain('speaker body guide marker')
-    expect(bodyGuide).toContain('margin-inline-start: .5rem;')
-    expect(bodyGuide).toContain('padding-inline-start: .75rem;')
+    expect(bodyGuide).toContain('.log-entry--speaker .log-messages::before')
+    expect(bodyGuide).toContain('inset-inline-start: -.35rem;')
     expect(bodyGuide).toContain(
       'border-inline-start: 2px solid color-mix(in srgb, var(--log-speaker-color) 38%, transparent);',
     )
-    expect(bodyGuide).not.toContain('text-decoration-line: underline;')
+    expect(bodyGuide).not.toContain('margin-inline-start: .5rem;')
+    expect(bodyGuide).not.toContain('padding-inline-start: .75rem;')
+    expect(bodyGuide).not.toContain('nameless narration guide marker')
+    expect(bodyGuide).not.toContain('speaker name after-line marker')
+    expect(bodyGuide).not.toContain('speaker name underline marker')
     expect(candidate).toContain('speaker name underline marker')
     expect(candidate).not.toContain('speaker name after-line marker')
-    expect(candidate).toContain(
-      'narration is quiet text without an extra line marker',
-    )
-    expect(candidate).toContain('margin: .85rem 1rem .85rem .5rem;')
-    expect(candidate).toContain('padding-inline: 0 .5rem;')
-    expect(candidate).toContain('border-inline-start: 0;')
+    expect(candidate).not.toContain('speaker body guide marker')
+    expect(candidate).not.toContain('padding-block: .35rem;')
     expect(candidate).toContain('color: #555555;')
     expect(candidate).toContain('<h3 class="log-scene">場面：地下室前</h3>')
-    expect(candidate).toContain('compact and slightly stronger info blocks')
   })
 
   it('keeps the combined candidate readable in dark mode', () => {
@@ -145,13 +182,24 @@ describe('output visual comparison helpers', () => {
 
     expect(candidate).toContain('color: #d0d0d0;')
     expect(candidate).toContain('color: #b8b8b8;')
+    expect(candidate).toContain(
+      '.log-entry--scene .log-message {\n    color: #b8b8b8;',
+    )
     expect(candidate).toContain('border-inline-start: 0;')
     expect(candidate).toContain(
-      'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.72) 0%)',
+      'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.56) 0%)',
     )
     expect(candidate).toContain(
-      'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.74) 0%)',
+      'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.58) 0%)',
     )
+    expect(candidate).not.toContain(
+      'linear-gradient(transparent 70%, #7fbfff 0%)',
+    )
+    expect(candidate).not.toContain(
+      'linear-gradient(transparent 70%, #ff7f7f 0%)',
+    )
+    expect(candidate).not.toContain('rgba(127, 191, 255, 0.72)')
+    expect(candidate).not.toContain('rgba(255, 127, 127, 0.74)')
   })
 })
 
