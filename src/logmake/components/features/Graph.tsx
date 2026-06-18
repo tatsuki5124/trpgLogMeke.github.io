@@ -6,35 +6,49 @@ import {
   LinearScale,
   Tooltip,
 } from 'chart.js'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Bar } from 'react-chartjs-2'
 
 import { GRAPH_LABELS, graphBuckets } from '@/logmake/lib/graphBuckets'
 import formStyles from '@/logmake/styles/forms.module.css'
-import type { CharacterConfig, GrowthAnalysis } from '@/logmake/types'
+import type {
+  CharacterConfig,
+  DiceRollAnalysis,
+  TabConfig,
+} from '@/logmake/types'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 
 type GraphType = 'grouped' | 'stacked'
 
 interface GraphProps {
-  analysis: GrowthAnalysis | null
+  rollAnalysis: DiceRollAnalysis | null
   characters: Record<string, CharacterConfig>
+  tabs: Record<string, TabConfig>
 }
 
-export function Graph({ analysis, characters }: GraphProps) {
+export function Graph({ rollAnalysis, characters, tabs }: GraphProps) {
   const [graphType, setGraphType] = useState<GraphType>('grouped')
+  const [visibleTabs, setVisibleTabs] = useState<Record<string, boolean>>(() =>
+    createVisibleTabs(tabs)
+  )
   const chartRef = useRef<ChartJS<'bar'>>(null)
 
-  if (!analysis || analysis.records.length === 0) {
+  useEffect(() => {
+    setVisibleTabs((current) => syncVisibleTabs(current, tabs))
+  }, [tabs])
+
+  if (!rollAnalysis || rollAnalysis.records.length === 0) {
     return null
   }
 
-  const datasets = Object.keys(analysis.byCharacter).map((charName) => {
-    const records = analysis.records.filter((record) => record.charName === charName)
+  const datasets = Object.entries(rollAnalysis.byCharacter).map(([charName, records]) => {
+    const visibleRecords = records.filter(
+      (record) => visibleTabs[record.tabName] !== false
+    )
     return {
       label: charName,
-      data: graphBuckets(records),
+      data: graphBuckets(visibleRecords),
       backgroundColor: characters[charName]?.color ?? '#6b8e23',
     }
   })
@@ -53,6 +67,22 @@ export function Graph({ analysis, characters }: GraphProps) {
   return (
     <div className={formStyles.graphBlock} data-testid="graph-root">
       <div className={formStyles.graphControls}>
+        {Object.values(tabs).map((tab) => (
+          <label key={tab.name} className={formStyles.checkboxLabel}>
+            <input
+              checked={visibleTabs[tab.name] ?? true}
+              type="checkbox"
+              onChange={(event) => {
+                const checked = event.currentTarget.checked
+                setVisibleTabs((current) => ({
+                  ...current,
+                  [tab.name]: checked,
+                }))
+              }}
+            />
+            {tab.name}
+          </label>
+        ))}
         <label className={formStyles.radioLabel}>
           <input
             type="radio"
@@ -102,5 +132,20 @@ export function Graph({ analysis, characters }: GraphProps) {
         }}
       />
     </div>
+  )
+}
+
+function createVisibleTabs(
+  tabs: Record<string, TabConfig>
+): Record<string, boolean> {
+  return Object.fromEntries(Object.keys(tabs).map((tabName) => [tabName, true]))
+}
+
+function syncVisibleTabs(
+  current: Record<string, boolean>,
+  tabs: Record<string, TabConfig>
+): Record<string, boolean> {
+  return Object.fromEntries(
+    Object.keys(tabs).map((tabName) => [tabName, current[tabName] ?? true])
   )
 }

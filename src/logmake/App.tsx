@@ -105,7 +105,11 @@ function App() {
             <GrowthCheck analysis={derived.analysis} tabs={tabs} />
           )}
           {activeTab === 'graph' && (
-            <Graph analysis={derived.analysis} characters={characters} />
+            <Graph
+              rollAnalysis={derived.diceRollAnalysis}
+              characters={characters}
+              tabs={tabs}
+            />
           )}
         </div>
       </div>

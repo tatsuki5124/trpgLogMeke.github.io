@@ -1,4 +1,4 @@
-import type { DiceRecord } from '@/logmake/types'
+import type { DiceRollRecord } from '@/logmake/types'
 
 /** ダイス値のグラフ用バケットラベル（"1-5" ～ "96-100" の 20 段階） */
 export const GRAPH_LABELS = Array.from(
@@ -7,12 +7,12 @@ export const GRAPH_LABELS = Array.from(
 )
 
 /**
- * DiceRecord の配列をダイス値の 5 刻みバケットに集計する。
+ * DiceRollRecord の配列をダイス値の 5 刻みバケットに集計する。
  *
  * @param records - 集計対象のダイスレコード配列
  * @returns 各バケットのカウント配列（インデックス 0 が 1-5、インデックス 19 が 96-100）
  */
-export function graphBuckets(records: DiceRecord[]): number[] {
+export function graphBuckets(records: DiceRollRecord[]): number[] {
   const buckets = Array.from({ length: 20 }, () => 0)
 
   for (const record of records) {

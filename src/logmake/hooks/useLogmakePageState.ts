@@ -2,6 +2,7 @@ import { startTransition, useEffect, useMemo, useState } from 'react'
 
 import { useDefaultSkillValues } from '@/logmake/hooks/useDefaultSkillValues'
 import { useFileReader } from '@/logmake/hooks/useFileReader'
+import { analyzeDiceRolls } from '@/logmake/lib/analyzeDiceRolls'
 import { analyzeGrowth } from '@/logmake/lib/analyzeGrowth'
 import { buildOutputHtml } from '@/logmake/lib/buildOutputHtml'
 import { buildOutputModel } from '@/logmake/lib/buildOutputModel'
@@ -66,13 +67,21 @@ export function useLogmakePageState() {
     return parseLogHtml(source.rawHtml, selectedSystem)
   }, [selectedSystem, source.rawHtml])
 
-  const analysis = useMemo(() => {
+  const diceRollAnalysis = useMemo(() => {
     if (!parsedLog) {
       return null
     }
 
-    return analyzeGrowth(parsedLog, selectedSystem, defaultSkillValues.data)
-  }, [defaultSkillValues.data, parsedLog, selectedSystem])
+    return analyzeDiceRolls(parsedLog)
+  }, [parsedLog])
+
+  const analysis = useMemo(() => {
+    if (!diceRollAnalysis) {
+      return null
+    }
+
+    return analyzeGrowth(diceRollAnalysis, selectedSystem, defaultSkillValues.data)
+  }, [defaultSkillValues.data, diceRollAnalysis, selectedSystem])
 
   const outputModel = useMemo(() => {
     if (!parsedLog) {
@@ -282,6 +291,7 @@ export function useLogmakePageState() {
     },
     derived: {
       analysis,
+      diceRollAnalysis,
       warnings,
       canDownload: outputModel.sections.length > 0,
     },
