@@ -121,24 +121,50 @@ export interface ParsedLog {
   warnings: string[]
 }
 
-/** 成長判定の1件分のレコード */
-export interface DiceRecord {
+/** グラフ・成長判定が共有する、採用出目1件分のレコード */
+export interface DiceRollRecord {
+  id: string
+  entryId: string
   charName: string
   tabName: string
-  ginou: string
   value: number
+  dice: DiceEvent
+}
+
+/** ログ全体の採用出目分析結果 */
+export interface DiceRollAnalysis {
+  byCharacter: Record<string, DiceRollRecord[]>
+  records: DiceRollRecord[]
+  warnings: string[]
+}
+
+/** 成長チェック上の判定対象種別 */
+export type GrowthTargetKind =
+  | 'known'
+  | 'genericD100'
+  | 'resistance'
+  | 'combination'
+  | 'freeText'
+
+/** 成長判定の1件分の表示レコード */
+export interface GrowthRecord {
+  id: string
+  roll: DiceRollRecord
   status: boolean
   label: GrowthLabel
+  targetNames: string[]
+  initialSuccessTargetNames: string[]
+  targetKind: GrowthTargetKind
 }
 
 /**
  * ログ全体の成長判定分析結果。
- * キャラクター別・ラベル別に DiceRecord を集約する。
+ * キャラクター別・ラベル別に GrowthRecord を集約する。
  */
 export interface GrowthAnalysis {
   labels: GrowthLabel[]
-  byCharacter: Record<string, Partial<Record<GrowthLabel, DiceRecord[]>>>
-  records: DiceRecord[]
+  byCharacter: Record<string, Partial<Record<GrowthLabel, GrowthRecord[]>>>
+  records: GrowthRecord[]
   warnings: string[]
 }
 
@@ -147,6 +173,7 @@ export interface ToggleVisibility {
   tabName: boolean
   value: boolean
   status: boolean
+  unknownSkill: boolean
 }
 
 /**

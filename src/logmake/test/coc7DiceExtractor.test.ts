@@ -23,6 +23,19 @@ describe('parseCoc7DiceToken', () => {
     expect(result?.targets[0].name).toBe('聞き耳')
   })
 
+  it('parses a secret D100 result', () => {
+    const result = parseCoc7DiceToken(
+      'sCC&lt;=50 【目星】 (1D100&lt;=50) ボーナス・ペナルティダイス[0] ＞ 30, 30 ＞ 30 ＞ 成功'
+    )
+
+    expect(result).toMatchObject({
+      command: 'sCC&lt;=50',
+      primaryRoll: 30,
+      outcomeText: '成功',
+      targets: [{ name: '目星', target: 50 }],
+    })
+  })
+
   it('parses a D100 hard success result', () => {
     const result = parseCoc7DiceToken(
       'CC&lt;=50h 【目星】 (1D100&lt;=50) ボーナス・ペナルティダイス[0] ＞ 25, 10 ＞ 10 ＞ ハード成功'

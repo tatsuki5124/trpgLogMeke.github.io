@@ -19,6 +19,7 @@ export interface CocDiceExtractorConfig {
 
 /** parseDiceResult の内部解析結果 */
 interface ParsedCocDiceResult {
+  kind: 'systemCommand' | 'genericD100'
   command: string
   outcomeText: string
   partOutcomes: string[]
@@ -66,12 +67,14 @@ export function createCocDiceExtractor(
   config: CocDiceExtractorConfig
 ): (fragment: string) => DiceEvent | undefined {
   const d100ResultRegex = createD100ResultRegex(config.commandPrefix)
+  const genericD100ResultRegex = createGenericD100ResultRegex()
   const commandResultRegex = createCommandResultRegex(config.commandPrefix)
 
   return function parseCocDiceToken(fragment: string): DiceEvent | undefined {
     const result = parseDiceResult(
       fragment,
       d100ResultRegex,
+      genericD100ResultRegex,
       commandResultRegex
     )
     if (!result) {
@@ -105,12 +108,14 @@ export function createCocDiceExtractor(
  *
  * @param fragment - 解析対象のログフラグメント
  * @param d100ResultRegex - d100 ロール形式の正規表現
+ * @param genericD100ResultRegex - 汎用 1d100 ロール形式の正規表現
  * @param commandResultRegex - コマンド形式の正規表現
  * @returns 解析結果、またはいずれにも一致しない場合は undefined
  */
 function parseDiceResult(
   fragment: string,
   d100ResultRegex: RegExp,
+  genericD100ResultRegex: RegExp,
   commandResultRegex: RegExp
 ): ParsedCocDiceResult | undefined {
   const d100Match = fragment.match(d100ResultRegex)
@@ -125,6 +130,28 @@ function parseDiceResult(
       return undefined
     }
     return {
+      kind: 'systemCommand',
+      roll: Number(roll),
+      outcomeText: outcome,
+      command,
+      tail,
+      partOutcomes: [],
+    }
+  }
+
+  const genericD100Match = fragment.match(genericD100ResultRegex)
+  if (genericD100Match?.groups) {
+    const { roll, outcome, command, tail } = genericD100Match.groups
+    if (
+      roll === undefined ||
+      outcome === undefined ||
+      command === undefined ||
+      tail === undefined
+    ) {
+      return undefined
+    }
+    return {
+      kind: 'genericD100',
       roll: Number(roll),
       outcomeText: outcome,
       command,
@@ -145,6 +172,7 @@ function parseDiceResult(
       return undefined
     }
     return {
+      kind: 'systemCommand',
       roll: Number(roll),
       outcomeText: outcome,
       command,
@@ -236,7 +264,12 @@ function parseCommandTargets(
   }
 
   const targetMatch = command.match(/&lt;=(\d+)/i)
-  return targetMatch ? [Number(targetMatch[1])] : []
+  if (targetMatch) {
+    return [Number(targetMatch[1])]
+  }
+
+  const rawTargetMatch = command.match(/<=(\d+)/i)
+  return rawTargetMatch ? [Number(rawTargetMatch[1])] : []
 }
 
 /**
@@ -272,7 +305,26 @@ function createD100ResultRegex(commandPrefix: string): RegExp {
       '^\\s*',
       `(?<command>${commandPrefix}[^\\s＞]*)`,
       '\\s*(?<tail>.*?)\\s*',
-      '\\(1D100&lt;=\\d+\\)',
+      '\\(1D100(?:&lt;=|<=)\\d+\\)',
+      '(?: ボーナス・ペナルティダイス\\[-?\\d+\\] ＞ [\\d,\\s]+)?',
+      ' ＞ (?<roll>\\d+) ＞ (?<outcome>.*)$',
+    ].join(''),
+    'i'
+  )
+}
+
+/**
+ * 汎用 1d100 形式（1d100<=N ... (1D100<=N) > ロール値 > アウトカム）を検出する正規表現を生成する。
+ *
+ * @returns 正規表現
+ */
+function createGenericD100ResultRegex(): RegExp {
+  return new RegExp(
+    [
+      '^\\s*',
+      '(?<command>1d100(?:&lt;=|<=)\\d+[^\\s＞]*)',
+      '\\s*(?<tail>.*?)\\s*',
+      '\\(1D100(?:&lt;=|<=)\\d+\\)',
       '(?: ボーナス・ペナルティダイス\\[-?\\d+\\] ＞ [\\d,\\s]+)?',
       ' ＞ (?<roll>\\d+) ＞ (?<outcome>.*)$',
     ].join(''),
