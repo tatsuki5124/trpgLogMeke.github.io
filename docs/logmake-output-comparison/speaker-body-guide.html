@@ -122,8 +122,8 @@
   /* logmake visual comparison: shared structured layout. */
   .log-entry--info {
     position: relative;
-    margin: 1.75rem 1.25rem 1.5rem;
-    padding: 1rem 1.5rem .5rem 1rem;
+    margin: 1.75rem .75rem 1.5rem;
+    padding: 1rem .75rem .5rem .75rem;
     border: solid 3px #707070;
     border-radius: 8px;
     background: #ffffff;
@@ -140,7 +140,6 @@
     line-height: 1;
     background: #ffffff;
     color: #707070;
-    font-weight: bold;
     font-size: 1rem;
   }
   .log-entry--info .log-message {
@@ -164,6 +163,8 @@
   }
   .log-scene {
     margin: 2rem 0 .65rem .5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid color-mix(in srgb, var(--log-speaker-color) 25%, transparent);
     color: var(--log-speaker-color);
   }
   .log-entry--scene .log-message {
@@ -245,7 +246,7 @@
             <section class="log-section log-section--primary" aria-labelledby="log-section-0-title">
     <h2 id="log-section-0-title" class="log-section-title">メイン</h2>
     <div class="log-entry log-entry--speaker" style="--log-speaker-color: #228b22;">
-    <span class="log-speaker">探索者A</span>
+    <strong class="log-speaker">探索者A</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>玄関ホールの床に残った泥の跡を調べます。足跡が外から内へ続いているなら、まだ誰かが屋敷の中にいるかもしれません。</span>
@@ -253,7 +254,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #3366cc;">
-    <span class="log-speaker">探索者B</span>
+    <strong class="log-speaker">探索者B</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>「窓の鍵は開いている？　ここで待つより、先に書斎を確認した方がよさそうだね」</span>
@@ -290,7 +291,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #bbbbbb;">
-    <span class="log-speaker">淡色の探索者</span>
+    <strong class="log-speaker">淡色の探索者</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>キャラクター色が背景や本文色に近い場合、本文までキャラクター色にすると読みにくくなるかを確認するための発言です。</span>
@@ -298,7 +299,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #d000a6;">
-    <span class="log-speaker">鮮烈な探索者</span>
+    <strong class="log-speaker">鮮烈な探索者</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>彩度の高いキャラクター色が長文本文に乗ったとき、発言者識別と読解負荷のどちらが勝つかを確認します。</span>
@@ -306,10 +307,10 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #228b22;">
-    <span class="log-speaker">探索者A</span>
+    <strong class="log-speaker">探索者A</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, #7fbfff 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
+    <span style="background: linear-gradient(transparent 70%, rgba(127, 191, 255, 0.7) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
 </p>
 </div>
 </div>
@@ -317,7 +318,7 @@
 <section class="log-section log-section--primary" aria-labelledby="log-section-1-title">
     <h2 id="log-section-1-title" class="log-section-title">情報</h2>
     <div class="log-entry log-entry--info">
-    <h4 class="log-info-title">古い日記</h4>
+    <p class="log-info-title"><strong>古い日記</strong></p>
     <div class="log-messages">
     <p class="log-message">
     <span>三日前の日付で「地下室の扉を開けてはいけない」とだけ書かれている。筆跡は震えていて、最後の一文だけ強く紙に刻み込まれている。</span>
@@ -325,11 +326,11 @@
 </div>
 </div>
 </section>
-<section class="log-section log-section--tab log-tab-0" title="雑談" aria-labelledby="log-section-2-title">
+<section class="log-section log-section--tab log-tab-0" aria-label="雑談">
     <h2 id="log-section-2-title" class="log-section-title">雑談</h2>
     <span class="log-section-tab-name" aria-hidden="true">雑談</span>
     <div class="log-entry log-entry--info">
-    <h4 class="log-info-title">雑談メモ</h4>
+    <p class="log-info-title"><strong>雑談メモ</strong></p>
     <div class="log-messages">
     <p class="log-message">
     <span>ここはPL相談用の補助タブです。配布HTMLでは読者が必要に応じて表示/非表示を切り替えられる想定です。</span>
@@ -337,7 +338,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #3366cc;">
-    <span class="log-speaker">探索者B</span>
+    <strong class="log-speaker">探索者B</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>補助タブ内でも人物発言として見えるケースです。タブのまとまりと、人物名の色や本文色が衝突しないかを確認します。</span>
@@ -345,7 +346,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--info">
-    <h4 class="log-info-title">手がかりメモ</h4>
+    <p class="log-info-title"><strong>手がかりメモ</strong></p>
     <div class="log-messages">
     <p class="log-message">
     <span>補助タブ内の情報ブロックです。タブのまとまりの内側で、情報枠の上下余白が広すぎないかを確認します。</span>
@@ -356,10 +357,10 @@
 <section class="log-section log-section--primary" aria-labelledby="log-section-3-title">
     <h2 id="log-section-3-title" class="log-section-title">メイン</h2>
     <div class="log-entry log-entry--speaker" style="--log-speaker-color: #3366cc;">
-    <span class="log-speaker">探索者B</span>
+    <strong class="log-speaker">探索者B</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, #ff7f7f 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
+    <span style="background: linear-gradient(transparent 70%, rgba(255, 127, 127, 0.7) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
 </p>
 <p class="log-message">
     <span>
@@ -368,7 +369,7 @@
 </div>
 </div>
 <div class="log-entry log-entry--speaker" style="--log-speaker-color: #228b22;">
-    <span class="log-speaker">探索者A</span>
+    <strong class="log-speaker">探索者A</strong>
     <div class="log-messages">
     <p class="log-message">
     <span>日記を閉じて、地下室の扉に手をかけます。開ける前に、誰かがついてきているかだけ振り返ります。もし足音が近づいているなら、扉を開ける前に廊下の角へ身を寄せて、相手の姿を確認してから進みたいです。</span>

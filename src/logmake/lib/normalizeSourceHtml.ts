@@ -55,17 +55,43 @@ function normalizeMultiRollBlock(
     .filter((line: string) => !line.startsWith('#'))
   const skillMatch = block.match(skillMultiRollRegex)
 
+  const repeatedCommand = readRepeatedCommand(commandLine)
+
   if (!skillMatch) {
-    return [commandLine, ...resultLines].join('<br>')
+    return [
+      commandLine,
+      ...resultLines.map((line: string) =>
+        appendRepeatedCommand(repeatedCommand, line),
+      ),
+    ].join('<br>')
   }
 
   const [, , command, target, skill] = skillMatch
-  const repeatedCommand = `${command}&lt;=${target} 【${skill}】`
+  const repeatedSkillCommand = `${command}&lt;=${target} 【${skill}】`
 
   return [
     commandLine,
     ...resultLines.map((line: string) =>
-      line.startsWith('(1D100') ? `${repeatedCommand} ${line}` : line,
+      appendRepeatedCommand(repeatedSkillCommand, line),
     ),
   ].join('<br>')
+}
+
+function readRepeatedCommand(commandLine: string): string {
+  return commandLine
+    .replace(/^(?:x|rep|repeat)\d+(?: |\u3000)/i, '')
+    .replace(/\s+#1$/, '')
+    .trim()
+}
+
+function appendRepeatedCommand(command: string, resultLine: string): string {
+  if (!command || resultLine.startsWith(command)) {
+    return resultLine
+  }
+
+  if (resultLine.startsWith('(1D100') || resultLine.startsWith('＞')) {
+    return `${command} ${resultLine}`
+  }
+
+  return `${command} ＞ ${resultLine}`
 }

@@ -23,9 +23,9 @@
   }
   body {
     background-color: #6b8e23;
-    color: #333333;
+    color: #d0d0d0;
     font-family: 'Hiragino Sans', sans-serif;
-    writing-mode: horizontal-tb;
+    writing-mode: vertical-rl;
   }
   .header{
     background-color: #6b8e23;
@@ -34,26 +34,36 @@
     z-index: 999;
     top:0;
     left:0;
+    writing-mode: horizontal-tb;
   }
   details {
     background-color: #6b8e23;
     padding: .3rem;
     margin: 0;
   }
+  details[open] {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details summary {
+    flex-shrink: 0;
+  }
   summary {
     padding-left: 3rem;
     margin: 0;
-    color: #ffffff;
+    color: #c8c8c8;
   }
   h1 {
     padding: .3rem .3rem .3rem 3rem;
     margin: 0;
-    color: #ffffff;
+    color: #c8c8c8;
     font-family: 'New Tegomin', serif;
   }
   .log-tab-controls{
     padding-left: 3rem;
-    color: #ffffff;
+    color: #c8c8c8;
   }
   .log-tab-controls label{
     display: inline-block;
@@ -66,7 +76,7 @@
     padding: 2rem;
     margin: 6rem 2rem 2rem;
     border: double 5px #6b8e23;
-    background-color: #ffffff;
+    background-color: #2d2d2d;
   }
   .log-message {
     margin: 0;
@@ -90,7 +100,7 @@
     margin: 1.5rem 0;
     padding: 1.5rem .75rem 1rem;
     box-sizing: border-box;
-    background: rgba(127,127,127,0.1);
+    background: rgba(200,200,200,0.06);
     border-inline-start: 3px solid var(--log-tab-color);
     overflow-wrap: break-word;
   }
@@ -124,9 +134,9 @@
     position: relative;
     margin: 1.75rem .75rem 1.5rem;
     padding: 1rem .75rem .5rem .75rem;
-    border: solid 3px #707070;
+    border: solid 3px #a8a8a8;
     border-radius: 8px;
-    background: #ffffff;
+    background: #2d2d2d;
     line-height: 1.5;
   }
   .log-info-title {
@@ -138,13 +148,13 @@
     margin: 0;
     padding: 0 .45rem;
     line-height: 1;
-    background: #ffffff;
-    color: #707070;
+    background: #2d2d2d;
+    color: #a8a8a8;
     font-size: 1rem;
   }
   .log-entry--info .log-message {
     margin: 0;
-    color: #707070;
+    color: #a8a8a8;
   }
   .log-section--tab .log-entry--info {
     margin: 1.1rem .75rem .95rem;
@@ -159,7 +169,7 @@
   }
   .log-entry--speaker .log-message {
     padding-block: .25rem;
-    color: #333333;
+    color: #d0d0d0;
   }
   .log-scene {
     margin: 2rem 0 .65rem .5rem;
@@ -168,18 +178,18 @@
     color: var(--log-speaker-color);
   }
   .log-entry--scene .log-message {
-    color: #555555;
+    color: #b8b8b8;
   }
   .log-entry--narration {
     margin: .65rem 1rem .65rem .5rem;
-    color: #555555;
+    color: #b8b8b8;
     opacity: 1;
   }
   .log-entry--narration .log-message {
     padding-block: .25rem;
     padding-inline: 0 .5rem;
     border-inline-start: 0;
-    color: #555555;
+    color: #b8b8b8;
   }
   @media screen and (max-width: 480px){
     html {
@@ -206,8 +216,8 @@
       margin: 5.5rem .6rem .6rem;
     }
   }
-  
-  
+
+
   /* logmake visual comparison: speaker name after-line marker. */
   .log-entry--speaker .log-speaker {
     display: inline-flex;
@@ -227,11 +237,11 @@
     </head>
     <body>
         <div class="header">
-            <h1>ログ出力比較 - ライト - 名前後ろライン</h1>
+            <h1>ログ出力比較 - 縦書き - ダーク - 名前後ろライン</h1>
             <details>
                 <summary>タブ表示</summary>
                 <div class="log-tab-controls">
-                    
+
                 <label for="log-tab-0-toggle">
                     <input
                         class="log-tab-0-control"
@@ -313,7 +323,7 @@
     <strong class="log-speaker">探索者A</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, rgba(127, 191, 255, 0.7) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
+    <span style="background: linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.65) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
 </p>
 </div>
 </div>
@@ -363,7 +373,7 @@
     <strong class="log-speaker">探索者B</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, rgba(255, 127, 127, 0.7) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
+    <span style="background: linear-gradient(to right, transparent 50%, rgba(255, 127, 127, 0.65) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
 </p>
 <p class="log-message">
     <span>

@@ -34,7 +34,7 @@ describe('buildOutputHtml', () => {
     expect(output).toContain('テストログ')
     expect(output).toContain('探索者A')
     expect(output).toContain('雑談')
-    expect(output).toContain('linear-gradient(transparent 70%, #ff7f7f 0%)')
+    expect(output).toContain('linear-gradient(transparent 70%, rgba(255, 127, 127, 0.7) 0%)')
   })
 
   it('escapes special characters in title, logFileName, and tab names', () => {
@@ -77,11 +77,11 @@ describe('buildOutputHtml', () => {
     expect(output).not.toContain('タブ<"quoted">')
     expect(output).toContain('&lt;&quot;quoted&quot;&gt;')
     expect(output).toContain('id="logmake-tab-0-toggle"')
-    expect(output).toContain('onchange="c_disp(this, \'logmake-tab-0\')"')
+    expect(output).toContain('onchange="toggleLogTab(this, \'logmake-tab-0\')"')
     expect(output).not.toContain('タブ&lt;&quot;quoted&quot;&gt; tab')
   })
 
-  it('adds the legacy tab class and visibility class to auxiliary tab sections', () => {
+  it('adds BEM section classes and CSS variable for auxiliary tab sections', () => {
     const model: OutputModel = {
       sections: [
         {
@@ -95,9 +95,9 @@ describe('buildOutputHtml', () => {
     }
     const output = buildOutputHtml(model, createDefaultSettings('test'))
 
-    expect(output).toContain(
-      '<div class="tab logmake-tab-0" style="border-left: 3px solid #ff0000;">'
-    )
+    expect(output).toContain('class="log-section log-section--tab logmake-tab-0"')
+    expect(output).toContain('--log-tab-color: #ff0000')
+    expect(output).toContain('aria-label="雑談"')
   })
 
   it('inserts valid hex color values into style attributes unchanged', () => {
@@ -186,32 +186,34 @@ describe('buildOutputHtml', () => {
     })
 
     expect(output).toContain('writing-mode: vertical-rl')
-    expect(output).toContain('class="tab logmake-tab-0"')
-    expect(output).toContain('border-top: 3px solid #ff0000')
+    expect(output).toContain('class="log-section log-section--tab logmake-tab-0"')
+    expect(output).toContain('--log-tab-color: #ff0000')
     expect(output).toContain(
-      'linear-gradient(to right, #7fbfff 50%, transparent 50%)'
+      'linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.7) 0%)'
     )
   })
 
-  it('縦書きモードではタブに border-top を使用する', () => {
+  it('縦書きモードのタブボーダーは border-inline-start で統一される', () => {
     const model: OutputModel = {
       sections: [{ tabName: '雑談', tabColor: '#ff0000', tabVisibilityClass: 'logmake-tab-0', entries: [] }],
       toggles: [],
     }
     const output = buildOutputHtml(model, { ...createDefaultSettings('test'), writingMode: 'vertical' })
 
-    expect(output).toContain('border-top: 3px solid #ff0000')
+    expect(output).toContain('border-inline-start')
+    expect(output).toContain('--log-tab-color: #ff0000')
+    expect(output).not.toContain('border-top: 3px solid #ff0000')
     expect(output).not.toContain('border-left: 3px solid #ff0000')
   })
 
-  it('縦書きモードでは成功ハイライトに右半分グラデーションを使用する', () => {
+  it('縦書きモードでは成功ハイライトに右方向グラデーションを使用する', () => {
     const html = readFileSync(path.join(FIXTURE_DIR, 'coc6-sample.html'), 'utf8')
     const parsed = parseLogHtml(html, COC6_SYSTEM)
     const outputModel = buildOutputModel(parsed, { tabs: parsed.tabs, characters: parsed.characters })
     const output = buildOutputHtml(outputModel, { ...createDefaultSettings('test'), writingMode: 'vertical' })
 
-    expect(output).toContain('linear-gradient(to right, #7fbfff 50%, transparent 50%)')
-    expect(output).not.toContain('linear-gradient(transparent 70%, #7fbfff 0%)')
+    expect(output).toContain('linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.7) 0%)')
+    expect(output).not.toContain('linear-gradient(transparent 70%, rgba(127, 191, 255, 0.7) 0%)')
   })
 
   it('ダークモードではタブ背景色に rgba(200,200,200,0.06) を使用する', () => {
@@ -221,7 +223,7 @@ describe('buildOutputHtml', () => {
     }
     const output = buildOutputHtml(model, { ...createDefaultSettings('test'), darkMode: true })
 
-    expect(output).toContain('class="tab logmake-tab-0"')
+    expect(output).toContain('class="log-section log-section--tab logmake-tab-0"')
     expect(output).toContain('rgba(200,200,200,0.06)')
     expect(output).not.toContain('rgba(127,127,127,0.1)')
   })

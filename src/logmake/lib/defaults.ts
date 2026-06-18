@@ -14,10 +14,37 @@ export const DARK_FRAME_COLOR = '#2c3e50'
 export const DARK_BACK_COLOR = '#2d2d2d'
 
 
-export const SUCCESS_HIGHLIGHT =
-  'linear-gradient(transparent 70%, #7fbfff 0%)'
-export const FAILURE_HIGHLIGHT =
-  'linear-gradient(transparent 70%, #ff7f7f 0%)'
+/**
+ * ライト/ダーク・横書き/縦書きの組み合わせに応じたハイライトグラデーションを返す。
+ * 横書き: 下 30% をハイライト。縦書き: 右 50% をハイライト（列の末尾方向）。
+ *
+ * @param isDark - ダークモードの場合は true
+ * @param isVertical - 縦書き表示の場合は true
+ * @returns 成功・失敗それぞれのハイライト CSS
+ */
+export function computeHighlights(
+  isDark: boolean,
+  isVertical: boolean,
+): { success: string; failure: string } {
+  if (isVertical) {
+    return {
+      success: isDark
+        ? 'linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.65) 0%)'
+        : 'linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.7) 0%)',
+      failure: isDark
+        ? 'linear-gradient(to right, transparent 50%, rgba(255, 127, 127, 0.65) 0%)'
+        : 'linear-gradient(to right, transparent 50%, rgba(255, 127, 127, 0.7) 0%)',
+    }
+  }
+  return {
+    success: isDark
+      ? 'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.65) 0%)'
+      : 'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.7) 0%)',
+    failure: isDark
+      ? 'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.65) 0%)'
+      : 'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.7) 0%)',
+  }
+}
 
 const TAB_COLOR_PALETTE = [
   '#8e5c5c',
@@ -95,6 +122,7 @@ export function createGrowthFilters(
       tabName: previous?.visibility.tabName ?? true,
       value: previous?.visibility.value ?? true,
       status: previous?.visibility.status ?? true,
+      unknownSkill: previous?.visibility.unknownSkill ?? false,
     },
   }
 }

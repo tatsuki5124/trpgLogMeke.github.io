@@ -1,8 +1,7 @@
 import {
   DARK_BACK_COLOR,
-  FAILURE_HIGHLIGHT,
   LIGHT_BACK_COLOR,
-  SUCCESS_HIGHLIGHT,
+  computeHighlights,
   isPrimaryTab,
 } from '@/logmake/lib/defaults'
 import { escapeText, sanitizeCssColor } from '@/logmake/lib/htmlUtils'
@@ -27,14 +26,10 @@ export function buildOutputHtml(
   outputModel: OutputModel,
   settings: LogmakeSettings
 ): string {
-  const isVertical = settings.writingMode === 'vertical'
-  const successHL = isVertical
-    ? 'linear-gradient(to right, #7fbfff 50%, transparent 50%)'
-    : SUCCESS_HIGHLIGHT
-  const failureHL = isVertical
-    ? 'linear-gradient(to right, #ff7f7f 50%, transparent 50%)'
-    : FAILURE_HIGHLIGHT
-  const tabBorderProp = isVertical ? 'border-top' : 'border-left'
+  const { success: successHL, failure: failureHL } = computeHighlights(
+    settings.darkMode ?? false,
+    settings.writingMode === 'vertical',
+  )
 
   // token.content は CCFOLIA の innerHTML をそのまま通す（意図的・escapeText 不可）。
   // エスケープすると CCFOLIA のインライン書式（<b> 等）が壊れる。
@@ -49,42 +44,60 @@ export function buildOutputHtml(
   }
 
   function renderParagraph(paragraph: ContentParagraph): string {
-    return `<p class="bbb">
+    return `<p class="log-message">
     ${paragraph.tokens.map(renderToken).join('<br>')}
 </p>`
   }
 
   function renderSpeaker(entry: OutputSpeakerEntry): string {
+    const speakerColor = sanitizeCssColor(entry.color)
+    const paragraphs = entry.paragraphs.map(renderParagraph).join('\n')
+
     if (entry.style === 'character') {
-      return `<div class="char" style="color: ${entry.color};">
-    <b>${escapeText(entry.charName)}</b>
-    ${entry.paragraphs.map(renderParagraph).join('\n')}
+      return `<div class="log-entry log-entry--speaker" style="--log-speaker-color: ${speakerColor};">
+    <strong class="log-speaker">${escapeText(entry.charName)}</strong>
+    ${paragraphs}
 </div>`
     }
 
     if (entry.style === 'scene') {
-      return `<p class="KP" style="color: ${entry.color};">${escapeText(entry.charName)}</p>
-${entry.paragraphs.map(renderParagraph).join('\n')}`
+      return `<div class="log-entry log-entry--scene" style="--log-speaker-color: ${speakerColor};">
+    <h3 class="log-scene">${escapeText(entry.charName)}</h3>
+    ${paragraphs}
+</div>`
     }
 
-    return `<div class="box">
-    <span class="box-title">${escapeText(entry.charName)}</span>
-    ${entry.paragraphs.map(renderParagraph).join('\n')}
+    return `<div class="log-entry log-entry--info">
+    <p class="log-info-title"><strong>${escapeText(entry.charName)}</strong></p>
+    ${paragraphs}
 </div>`
   }
 
-  function renderSection(section: OutputSection): string {
-    const className = isPrimaryTab(section.tabName)
-      ? 'mainBlock'
-      : `tab ${section.tabVisibilityClass}`
+  function renderSection(section: OutputSection, index: number): string {
+    const sectionTitleId = `log-section-${index}-title`
+    const isPrimary = isPrimaryTab(section.tabName)
+    const className = isPrimary
+      ? 'log-section log-section--primary'
+      : `log-section log-section--tab ${section.tabVisibilityClass}`
 
-    const style = isPrimaryTab(section.tabName)
+    const style = isPrimary
       ? ''
-      : ` style="${tabBorderProp}: 3px solid ${sanitizeCssColor(section.tabColor)};"`
+      : ` style="--log-tab-color: ${sanitizeCssColor(section.tabColor)};"`
 
-    return `<div class="${className}"${style}>
-    ${section.entries.map(renderSpeaker).join('\n')}
-</div>`
+    const ariaAttr = isPrimary
+      ? ` aria-labelledby="${sectionTitleId}"`
+      : ` aria-label="${escapeText(section.tabName)}"`
+
+    const tabNameLabel = isPrimary
+      ? ''
+      : `    <span class="log-section-tab-name" aria-hidden="true">${escapeText(section.tabName)}</span>\n`
+
+    const entries = section.entries.map(renderSpeaker).join('\n')
+
+    return `<section class="${className}"${style}${ariaAttr}>
+    <h2 id="${sectionTitleId}" class="log-section-title">${escapeText(section.tabName)}</h2>
+${tabNameLabel}    ${entries}
+</section>`
   }
 
   const viewCheck = outputModel.toggles
@@ -95,15 +108,17 @@ ${entry.paragraphs.map(renderParagraph).join('\n')}`
                         type="checkbox"
                         id="${tab.inputId}"
                         checked="checked"
-                        onchange="c_disp(this, '${tab.tabVisibilityClass}')"
-                        style="accent-color: ${tab.color};"
+                        onchange="toggleLogTab(this, '${tab.tabVisibilityClass}')"
+                        style="accent-color: ${sanitizeCssColor(tab.color)};"
                     />
                     <span>${escapeText(tab.name)}</span>
                 </label>`
     )
     .join('\n')
 
-  const content = outputModel.sections.map(renderSection).join('\n')
+  const content = outputModel.sections
+    .map((section, index) => renderSection(section, index))
+    .join('\n')
 
   return `<!DOCTYPE html>
 <html lang="ja">
@@ -111,7 +126,7 @@ ${entry.paragraphs.map(renderParagraph).join('\n')}`
         <title>${escapeText(settings.logFileName)}</title>
         <meta charset="UTF-8">
         <script type="text/javascript">
-            function c_disp(obj, name) {
+            function toggleLogTab(obj, name) {
                 const nodes = document.getElementsByClassName(name)
                 for (let i = 0; i < nodes.length; i += 1) {
                     nodes[i].style.display = obj.checked ? 'block' : 'none'
@@ -127,14 +142,14 @@ ${entry.paragraphs.map(renderParagraph).join('\n')}`
             <h1>${escapeText(settings.title)}</h1>
             <details>
                 <summary>タブ表示</summary>
-                <div class="viewCheck">
+                <div class="log-tab-controls">
                     ${viewCheck}
                 </div>
             </details>
         </div>
-        <div class="box5">
+        <main class="log-frame">
             ${content}
-        </div>
+        </main>
     </body>
 </html>`
 }
@@ -150,6 +165,8 @@ function buildStyle(settings: LogmakeSettings): string {
   const name = sanitizeCssColor(settings.nameColor)
   const back = settings.darkMode ? DARK_BACK_COLOR : LIGHT_BACK_COLOR
   const textColor = settings.darkMode ? '#d0d0d0' : '#333333'
+  const narrationColor = settings.darkMode ? '#b8b8b8' : '#555555'
+  const infoColor = settings.darkMode ? '#a8a8a8' : '#707070'
   const tabBg = settings.darkMode ? 'rgba(200,200,200,0.06)' : 'rgba(127,127,127,0.1)'
   return `<style>
   @import url('https://fonts.googleapis.com/css?family=Noto+Sans+JP');
@@ -163,13 +180,13 @@ function buildStyle(settings: LogmakeSettings): string {
     font-family: 'Hiragino Sans', sans-serif;
     writing-mode: ${settings.writingMode === 'vertical' ? 'vertical-rl' : 'horizontal-tb'};
   }
-  .header{
+  .header {
     background-color: ${frame};
-    width:100%;
+    width: 100%;
     position: fixed;
     z-index: 999;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
   }
   details {
     background-color: ${frame};
@@ -187,71 +204,128 @@ function buildStyle(settings: LogmakeSettings): string {
     color: ${name};
     font-family: 'New Tegomin', serif;
   }
-  .viewCheck{
+  .log-tab-controls {
     padding-left: 3rem;
     color: ${name};
   }
-  .viewCheck label{
+  .log-tab-controls label {
     display: inline-block;
     margin-right: .75rem;
   }
-  .box5 {
+  .log-frame {
     padding: 2rem;
     margin: 6rem 2rem 2rem;
     border: double 5px ${frame};
     background-color: ${back};
   }
-  .box5 p {
+  .log-message {
     margin: 0;
     padding: .5rem;
     text-align: left;
   }
-  .tab {
-    position: relative;
-    margin: 1.5rem 0;
-    padding: 1rem 1.5rem 1rem 1rem;
-    box-sizing: border-box;
-    background: ${tabBg};
+  .log-message,
+  .log-section-tab-name,
+  .log-info-title,
+  .log-speaker,
+  .log-scene {
+    word-break: normal;
+    word-break: auto-phrase;
     overflow-wrap: break-word;
   }
-  .box {
+  .log-section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .log-section {
     position: relative;
-    margin: 2rem 1rem;
-    padding: 1rem 1.5rem .5rem 1rem;
-    border: solid 3px #888888;
+  }
+  .log-section--tab {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 1.5rem .75rem 1rem;
+    box-sizing: border-box;
+    background: ${tabBg};
+    border-inline-start: 3px solid var(--log-tab-color);
+    overflow-wrap: break-word;
+  }
+  .log-section-tab-name {
+    position: absolute;
+    top: .35rem;
+    right: .75rem;
+    max-width: 40%;
+    color: var(--log-tab-color);
+    font-size: .75rem;
+    font-weight: bold;
+    line-height: 1.2;
+    opacity: .45;
+    pointer-events: none;
+    text-align: right;
+    writing-mode: horizontal-tb;
+  }
+  .log-entry--info {
+    position: relative;
+    margin: 1.75rem .75rem 1.5rem;
+    padding: 1rem .75rem .5rem .75rem;
+    border: solid 3px ${infoColor};
     border-radius: 8px;
     background: ${back};
     line-height: 1.5;
   }
-  .box .box-title {
+  .log-info-title {
     position: absolute;
     display: inline-block;
     top: -0.6rem;
     left: .5rem;
-    padding: 0 .5rem;
+    right: auto;
+    margin: 0;
+    padding: 0 .45rem;
     line-height: 1;
     background: ${back};
-    color: #888888;
+    color: ${infoColor};
+    font-size: 1rem;
+  }
+  .log-entry--info .log-message {
+    margin: 0;
+    color: ${infoColor};
+  }
+  .log-speaker {
+    display: block;
+    color: var(--log-speaker-color);
     font-weight: bold;
   }
-  .box p {
-    margin: 0;
-    color: #888888;
+  .log-entry--speaker {
+    margin: 1.7rem 1rem 1.7rem .5rem;
   }
-  b {
-    display: block;
+  .log-entry--speaker .log-message {
+    padding-block: .25rem;
+    color: ${textColor};
   }
-  .bbb {
-    display: block;
-    margin: 0rem 0.3rem;
+  .log-scene {
+    margin: 2rem 0 .65rem .5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid color-mix(in srgb, var(--log-speaker-color) 25%, transparent);
+    color: var(--log-speaker-color);
   }
-  .char {
-    margin: 1.5rem 1rem 1.5rem 0.5rem;
+  .log-entry--scene .log-message {
+    color: ${narrationColor};
   }
-  .KP {
-    margin-left: .5rem;
+  .log-entry--narration {
+    margin: .65rem 1rem .65rem .5rem;
+    color: ${narrationColor};
   }
-  @media screen and (max-width: 480px){
+  .log-entry--narration .log-message {
+    padding-block: .25rem;
+    padding-inline: 0 .5rem;
+    color: ${narrationColor};
+  }
+  @media screen and (max-width: 480px) {
     html {
       font-size: 14px;
     }
@@ -259,7 +333,7 @@ function buildStyle(settings: LogmakeSettings): string {
       padding: .2rem .2rem .2rem 1.5rem;
       font-size: 27px;
     }
-    .viewCheck{
+    .log-tab-controls {
       padding-left: 1.5rem;
     }
     details {
@@ -271,7 +345,7 @@ function buildStyle(settings: LogmakeSettings): string {
     main {
       width: 100%;
     }
-    .box5{
+    .log-frame {
       padding: 0.8rem;
       margin: 5.5rem .6rem .6rem;
     }

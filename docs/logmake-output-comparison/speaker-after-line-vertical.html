@@ -25,7 +25,7 @@
     background-color: #6b8e23;
     color: #333333;
     font-family: 'Hiragino Sans', sans-serif;
-    writing-mode: horizontal-tb;
+    writing-mode: vertical-rl;
   }
   .header{
     background-color: #6b8e23;
@@ -34,11 +34,21 @@
     z-index: 999;
     top:0;
     left:0;
+    writing-mode: horizontal-tb;
   }
   details {
     background-color: #6b8e23;
     padding: .3rem;
     margin: 0;
+  }
+  details[open] {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  details summary {
+    flex-shrink: 0;
   }
   summary {
     padding-left: 3rem;
@@ -206,8 +216,8 @@
       margin: 5.5rem .6rem .6rem;
     }
   }
-  
-  
+
+
   /* logmake visual comparison: speaker name after-line marker. */
   .log-entry--speaker .log-speaker {
     display: inline-flex;
@@ -227,11 +237,11 @@
     </head>
     <body>
         <div class="header">
-            <h1>ログ出力比較 - ライト - 名前後ろライン</h1>
+            <h1>ログ出力比較 - 縦書き - ライト - 名前後ろライン</h1>
             <details>
                 <summary>タブ表示</summary>
                 <div class="log-tab-controls">
-                    
+
                 <label for="log-tab-0-toggle">
                     <input
                         class="log-tab-0-control"
@@ -313,7 +323,7 @@
     <strong class="log-speaker">探索者A</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, rgba(127, 191, 255, 0.7) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
+    <span style="background: linear-gradient(to right, transparent 50%, rgba(127, 191, 255, 0.7) 0%);">CCB&lt;=65 【目星】 (1D100&lt;=65) ＞ 24 ＞ 成功</span>
 </p>
 </div>
 </div>
@@ -363,7 +373,7 @@
     <strong class="log-speaker">探索者B</strong>
     <div class="log-messages">
     <p class="log-message">
-    <span style="background: linear-gradient(transparent 70%, rgba(255, 127, 127, 0.7) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
+    <span style="background: linear-gradient(to right, transparent 50%, rgba(255, 127, 127, 0.7) 0%);">CCB&lt;=25 【聞き耳】 (1D100&lt;=25) ＞ 96 ＞ 致命的失敗</span>
 </p>
 <p class="log-message">
     <span>

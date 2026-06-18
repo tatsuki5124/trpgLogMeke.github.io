@@ -247,6 +247,93 @@ describe('parseLogHtml', () => {
     })
   })
 
+  it('parses generic 1d100 results with and without target names', () => {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="ja">
+        <body>
+          <p style="color:#228b22;">
+            <span>[main]</span><span>探索者A</span> :
+            <span>1d100&lt;=50 (1D100&lt;=50) ＞ 89 ＞ 失敗</span>
+          </p>
+          <p style="color:#228b22;">
+            <span>[main]</span><span>探索者A</span> :
+            <span>1d100&lt;=50 【正気度ロール】 (1D100&lt;=50) ＞ 89 ＞ 失敗</span>
+          </p>
+        </body>
+      </html>
+    `
+    const dice = parseLogHtml(html, COC6_SYSTEM).entries.map(
+      (entry) => entry.paragraphs[0].tokens[0].dice
+    )
+
+    expect(dice[0]).toMatchObject({
+      command: '1d100&lt;=50',
+      targets: [],
+      primaryRoll: 89,
+      outcomeText: '失敗',
+    })
+    expect(dice[1]).toMatchObject({
+      command: '1d100&lt;=50',
+      targets: [{ name: '正気度ロール', target: 50 }],
+      primaryRoll: 89,
+      outcomeText: '失敗',
+      status: true,
+    })
+  })
+
+  it('parses secret CoC dice commands', () => {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="ja">
+        <body>
+          <p style="color:#228b22;">
+            <span>[main]</span><span>探索者A</span> :
+            <span>sCCB&lt;=50 【目星】 (1D100&lt;=50) ＞ 30 ＞ 成功</span>
+          </p>
+          <p style="color:#228b22;">
+            <span>[main]</span><span>探索者A</span> :
+            <span>sRESB(12-10) ＞ 35 ＞ 成功</span>
+          </p>
+          <p style="color:#228b22;">
+            <span>[main]</span><span>探索者A</span> :
+            <span>sCBRB(50,25) こぶし,組み付き ＞ 30[成功,失敗] ＞ 部分的成功</span>
+          </p>
+        </body>
+      </html>
+    `
+    const dice = parseLogHtml(html, COC6_SYSTEM).entries.map(
+      (entry) => entry.paragraphs[0].tokens[0].dice
+    )
+
+    expect(dice[0]).toMatchObject({
+      command: 'sCCB&lt;=50',
+      targets: [{ name: '目星', target: 50 }],
+      primaryRoll: 30,
+      outcomeText: '成功',
+    })
+    expect(dice[1]).toMatchObject({
+      command: 'sRESB(12-10)',
+      targets: [],
+      primaryRoll: 35,
+      outcomeText: '成功',
+    })
+    expect(dice[2]?.targets).toEqual([
+      {
+        name: 'こぶし（パンチ）',
+        judge: '&lt;=50 【こぶし（パンチ）】',
+        outcomeText: '成功',
+        target: 50,
+      },
+      {
+        name: '組み付き',
+        judge: '&lt;=25 【組み付き】',
+        outcomeText: '失敗',
+        target: 25,
+      },
+    ])
+  })
+
   it('uses system rules to distinguish CoC6-only and CoC7 commands', () => {
     const html = `
       <!DOCTYPE html>

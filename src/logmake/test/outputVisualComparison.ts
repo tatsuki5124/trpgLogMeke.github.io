@@ -1,8 +1,7 @@
 import {
   DARK_BACK_COLOR,
   LIGHT_BACK_COLOR,
-  FAILURE_HIGHLIGHT,
-  SUCCESS_HIGHLIGHT,
+  computeHighlights,
   isPrimaryTab,
 } from '@/logmake/lib/defaults'
 import { buildOutputModel } from '@/logmake/lib/buildOutputModel'
@@ -28,10 +27,6 @@ const COMPARISON_STYLE_OVERRIDES: Record<string, CharacterStyle> = {
 }
 
 const NAMELESS_NARRATION_NAMES = new Set(['KP', 'GM', '話者なし'])
-const DARK_SUCCESS_HIGHLIGHT =
-  'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.56) 0%)'
-const DARK_FAILURE_HIGHLIGHT =
-  'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.58) 0%)'
 
 type StructuredComparisonVariantOptions = {
   speakerNameMarker?: 'after-line' | 'underline'
@@ -267,7 +262,9 @@ function renderStructuredSection(
   const className = isPrimary
     ? 'log-section log-section--primary'
     : `log-section log-section--tab ${section.tabVisibilityClass}`
-  const title = isPrimary ? '' : ` title="${escapeText(section.tabName)}"`
+  const ariaAttr = isPrimary
+    ? ` aria-labelledby="${sectionTitleId}"`
+    : ` aria-label="${escapeText(section.tabName)}"`
   const tabNameLabel = isPrimary
     ? ''
     : `    <span class="log-section-tab-name" aria-hidden="true">${escapeText(section.tabName)}</span>\n`
@@ -275,7 +272,7 @@ function renderStructuredSection(
     .map((entry) => renderStructuredSpeaker(entry, options, settings))
     .join('\n')
 
-  return `<section class="${className}"${title} aria-labelledby="${sectionTitleId}">
+  return `<section class="${className}"${ariaAttr}>
     <h2 id="${sectionTitleId}" class="log-section-title">${escapeText(section.tabName)}</h2>
 ${tabNameLabel}    ${entries}
 </section>`
@@ -295,7 +292,7 @@ function renderStructuredSpeaker(
 
   if (entry.style === 'character') {
     return `<div class="log-entry log-entry--speaker" style="--log-speaker-color: ${speakerColor};">
-    <span class="log-speaker">${escapeText(entry.charName)}</span>
+    <strong class="log-speaker">${escapeText(entry.charName)}</strong>
     ${messages}
 </div>`
   }
@@ -304,7 +301,7 @@ function renderStructuredSpeaker(
     if (NAMELESS_NARRATION_NAMES.has(entry.charName)) {
       if (options.namelessSceneMode === 'speaker') {
         return `<div class="log-entry log-entry--speaker" style="--log-speaker-color: ${speakerColor};">
-    <span class="log-speaker">${escapeText(entry.charName)}</span>
+    <strong class="log-speaker">${escapeText(entry.charName)}</strong>
     ${messages}
 </div>`
       }
@@ -321,7 +318,7 @@ function renderStructuredSpeaker(
   }
 
   return `<div class="log-entry log-entry--info">
-    <h4 class="log-info-title">${escapeText(entry.charName)}</h4>
+    <p class="log-info-title"><strong>${escapeText(entry.charName)}</strong></p>
     ${messages}
 </div>`
 }
@@ -338,13 +335,12 @@ function renderStructuredParagraph(
 }
 
 function renderStructuredToken(token: ContentToken, isDarkMode: boolean): string {
+  const { success, failure } = computeHighlights(isDarkMode, false)
   if (token.highlight === 'success') {
-    const highlight = isDarkMode ? DARK_SUCCESS_HIGHLIGHT : SUCCESS_HIGHLIGHT
-    return `<span style="background: ${highlight};">${token.content}</span>`
+    return `<span style="background: ${success};">${token.content}</span>`
   }
   if (token.highlight === 'failure') {
-    const highlight = isDarkMode ? DARK_FAILURE_HIGHLIGHT : FAILURE_HIGHLIGHT
-    return `<span style="background: ${highlight};">${token.content}</span>`
+    return `<span style="background: ${failure};">${token.content}</span>`
   }
   return `<span>${token.content}</span>`
 }
@@ -472,8 +468,8 @@ function buildStructuredStyle(
   /* logmake visual comparison: shared structured layout. */
   .log-entry--info {
     position: relative;
-    margin: 1.75rem 1.25rem 1.5rem;
-    padding: 1rem 1.5rem .5rem 1rem;
+    margin: 1.75rem .75rem 1.5rem;
+    padding: 1rem .75rem .5rem .75rem;
     border: solid 3px ${infoColor};
     border-radius: 8px;
     background: ${back};
@@ -490,7 +486,6 @@ function buildStructuredStyle(
     line-height: 1;
     background: ${back};
     color: ${infoColor};
-    font-weight: bold;
     font-size: 1rem;
   }
   .log-entry--info .log-message {
@@ -514,6 +509,8 @@ function buildStructuredStyle(
   }
   .log-scene {
     margin: 2rem 0 .65rem .5rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid color-mix(in srgb, var(--log-speaker-color) 25%, transparent);
     color: var(--log-speaker-color);
   }
   .log-entry--scene .log-message {

@@ -116,7 +116,7 @@ describe('output visual comparison helpers', () => {
       expect(structuredHtml).toContain('margin: .65rem 1rem .65rem .5rem;')
       expect(structuredHtml).toContain('padding-inline: 0 .5rem;')
       expect(structuredHtml).toContain('border-inline-start: 0;')
-      expect(structuredHtml).toContain('margin: 1.75rem 1.25rem 1.5rem;')
+      expect(structuredHtml).toContain('margin: 1.75rem .75rem 1.5rem;')
       expect(structuredHtml).toContain('border: solid 3px #707070;')
       expect(structuredHtml).toContain('margin: 1.1rem .75rem .95rem;')
       expect(structuredHtml).not.toContain('compact tab content spacing')
@@ -132,9 +132,9 @@ describe('output visual comparison helpers', () => {
 
     expect(coloredBody).toContain('speaker body character color')
     expect(coloredBody).toContain('color: var(--log-speaker-color);')
-    expect(coloredBody).toContain('<span class="log-speaker">KP</span>')
-    expect(coloredBody).toContain('<span class="log-speaker">GM</span>')
-    expect(coloredBody).toContain('<span class="log-speaker">話者なし</span>')
+    expect(coloredBody).toContain('<strong class="log-speaker">KP</strong>')
+    expect(coloredBody).toContain('<strong class="log-speaker">GM</strong>')
+    expect(coloredBody).toContain('<strong class="log-speaker">話者なし</strong>')
     expect(coloredBody).not.toContain('log-entry--nameless-narration')
     expect(coloredBody).not.toContain('nameless narration guide marker')
     expect(coloredBody).not.toContain('speaker name after-line marker')
@@ -187,10 +187,10 @@ describe('output visual comparison helpers', () => {
     )
     expect(candidate).toContain('border-inline-start: 0;')
     expect(candidate).toContain(
-      'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.56) 0%)',
+      'linear-gradient(transparent 70%, rgba(127, 191, 255, 0.65) 0%)',
     )
     expect(candidate).toContain(
-      'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.58) 0%)',
+      'linear-gradient(transparent 70%, rgba(255, 127, 127, 0.65) 0%)',
     )
     expect(candidate).not.toContain(
       'linear-gradient(transparent 70%, #7fbfff 0%)',

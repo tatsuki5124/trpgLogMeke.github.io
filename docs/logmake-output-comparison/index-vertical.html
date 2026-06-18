@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>ログ出力比較 - 縦書き</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+        background: #f3f4f1;
+        color: #202020;
+      }
+      header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #d0d4cc;
+        background: #ffffff;
+      }
+      h1 {
+        margin: 0 0 .4rem;
+        font-size: 1.2rem;
+      }
+      header p {
+        margin: 0;
+        color: #555555;
+        font-size: .92rem;
+      }
+      header nav {
+        margin-top: .5rem;
+        font-size: .88rem;
+      }
+      main {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .variant {
+        min-width: 0;
+      }
+      h2 {
+        margin: 0 0 .3rem;
+        font-size: 1rem;
+      }
+      .variant p {
+        margin: 0 0 .5rem;
+        font-size: .88rem;
+      }
+      iframe {
+        width: 100%;
+        height: 78vh;
+        border: 1px solid #c8c8c8;
+        background: #ffffff;
+      }
+      @media (max-width: 1100px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        iframe {
+          height: 72vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>ログ出力比較 - 縦書き</h1>
+      <p>同一fixtureから生成した縦書き版を、ライト/ダーク・マーカースタイル別に比較するための確認ページです。</p>
+      <nav><a href="./index.html">← 横書き比較へ</a></nav>
+    </header>
+    <main>
+      <section class="variant">
+        <h2>縦書きライト / 名前後ろライン</h2>
+        <p><a href="./speaker-after-line-vertical.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きライト 名前後ろライン" src="./speaker-after-line-vertical.html"></iframe>
+      </section>
+      <section class="variant">
+        <h2>縦書きライト / 本文ガイド</h2>
+        <p><a href="./speaker-body-guide-vertical.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きライト 本文ガイド" src="./speaker-body-guide-vertical.html"></iframe>
+      </section>
+      <section class="variant">
+        <h2>縦書きライト / 統合候補</h2>
+        <p><a href="./candidate-combined-vertical.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きライト 統合候補" src="./candidate-combined-vertical.html"></iframe>
+      </section>
+      <section class="variant">
+        <h2>縦書きダーク / 名前後ろライン</h2>
+        <p><a href="./speaker-after-line-vertical-dark.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きダーク 名前後ろライン" src="./speaker-after-line-vertical-dark.html"></iframe>
+      </section>
+      <section class="variant">
+        <h2>縦書きダーク / 本文ガイド</h2>
+        <p><a href="./speaker-body-guide-vertical-dark.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きダーク 本文ガイド" src="./speaker-body-guide-vertical-dark.html"></iframe>
+      </section>
+      <section class="variant">
+        <h2>縦書きダーク / 統合候補</h2>
+        <p><a href="./candidate-combined-vertical-dark.html" target="_blank" rel="noreferrer">別タブで開く</a></p>
+        <iframe title="縦書きダーク 統合候補" src="./candidate-combined-vertical-dark.html"></iframe>
+      </section>
+    </main>
+  </body>
+</html>
