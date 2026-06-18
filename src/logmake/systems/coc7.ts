@@ -5,9 +5,9 @@ import { createCocGrowth } from '@/logmake/systems/coc/cocGrowth'
 import type { LogmakeSystem } from '@/logmake/systems/types'
 
 const parseCoc7DiceToken = createCocDiceExtractor({
-  commandPrefix: '(?:CC(?!B)|CBR(?!B))',
-  optionRegex: /(?:CC(?!B)|CBR(?!B))[-+0-9()]*&lt;=\d+([rhec])/i,
-  combineCommandPattern: /^CBR\((\d+)\s*,\s*(\d+)\)/i,
+  commandPrefix: '(?:S?(?:CC(?!B)|CBR(?!B)))',
+  optionRegex: /S?(?:CC(?!B)|CBR(?!B))[-+0-9()]*(?:&lt;=|<=)\d+([rhec])/i,
+  combineCommandPattern: /^S?CBR\((\d+)\s*,\s*(\d+)\)/i,
   skillAliases: {},
 })
 
@@ -41,9 +41,9 @@ export const COC7_SYSTEM: LogmakeSystem = {
   log: {
     normalizeSource: createLogSourceNormalizer({
       multiRollRegex:
-        /(?:x|rep|repeat)\d+( |\u3000)(CC|CBR)(.*)\s+#\d+\n(.*)(\n\n+#\d+\n(.*))+(クリティカル|決定的成功|イクストリーム成功|ハード成功|成功|失敗|ファンブル)/gi,
+        /(?:x|rep|repeat)\d+( |\u3000)(S?(?:CC(?!B)|CBR(?!B)))(.*)\s+#\d+\n(.*)(\n\n+#\d+\n(.*))+(クリティカル|決定的成功|イクストリーム成功|ハード成功|成功|失敗|ファンブル|部分的成功)/gi,
       skillMultiRollRegex:
-        /(?:x|rep|repeat)\d+( |\u3000)(CC|CBR)[-+0-9()]*&lt;=(\d+[crhe]*) 【(.*)】\s+#\d+\n/i,
+        /(?:x|rep|repeat)\d+( |\u3000)(S?(?:CC(?!B)|CBR(?!B)))[-+0-9()]*(?:&lt;=|<=)(\d+[crhe]*) 【(.*)】\s+#\d+\n/i,
     }),
     parseToken: parseCoc7DiceToken,
   },

@@ -168,6 +168,23 @@ export function GrowthCheck({ analysis, tabs }: GrowthCheckProps) {
                       />
                       ステ依存
                     </label>
+                    <label className={formStyles.checkboxLabel}>
+                      <input
+                        checked={filters.visibility.unknownSkill}
+                        type="checkbox"
+                        onChange={(event) => {
+                          const checked = event.currentTarget.checked
+                          setFilters((current) => ({
+                            ...current,
+                            visibility: {
+                              ...current.visibility,
+                              unknownSkill: checked,
+                            },
+                          }))
+                        }}
+                      />
+                      技能不明
+                    </label>
                   </div>
                 </td>
               </tr>

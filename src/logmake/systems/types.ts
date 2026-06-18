@@ -1,27 +1,35 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
 import type {
   DiceEvent,
-  DiceEventTarget,
+  DiceRollRecord,
   GameSystem,
   GrowthLabel,
+  GrowthTargetKind,
 } from '@/logmake/types'
 
-/** GrowthCapability.classifyRecord に渡す判定オプション */
-export interface ClassifyGrowthOptions {
+/** GrowthCapability.classifyEvent に渡す判定オプション */
+export interface ClassifyGrowthEventOptions {
   defaultSkillValues: DefaultSkillValueMap
-  dice: DiceEvent
-  target: DiceEventTarget
+  roll: DiceRollRecord
+}
+
+/** システム固有の成長判定分類結果 */
+export interface GrowthClassification {
+  label: GrowthLabel
+  targetNames: string[]
+  initialSuccessTargetNames: string[]
+  status: boolean
+  targetKind: GrowthTargetKind
 }
 
 /**
  * システム固有の成長判定機能を定義するインターフェース。
- * ラベルの種類・デフォルト技能値の読み込み・ラベル分類・対象判定を提供する。
+ * ラベルの種類・デフォルト技能値の読み込み・ロール単位の分類を提供する。
  */
 export interface GrowthCapability {
   labels: GrowthLabel[]
   loadDefaultSkillValues(): Promise<DefaultSkillValueMap>
-  classifyRecord(options: ClassifyGrowthOptions): GrowthLabel
-  isGrowthTarget(dice: DiceEvent): boolean
+  classifyEvent(options: ClassifyGrowthEventOptions): GrowthClassification | null
 }
 
 /**

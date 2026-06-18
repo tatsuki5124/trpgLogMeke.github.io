@@ -1,12 +1,16 @@
 import {
   COC_GROWTH_OUTCOME_REGEX,
-  isInitialSkillSuccess,
   readCocOption,
 } from '@/logmake/systems/coc/shared'
-import type { GrowthCapability } from '@/logmake/systems/types'
+import type { GrowthCapability, GrowthClassification } from '@/logmake/systems/types'
 import { normalizeDefaultSkillValues } from '@/logmake/lib/defaultSkillValues'
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
-import type { DiceEvent, DiceEventTarget, GrowthLabel } from '@/logmake/types'
+import type {
+  DiceEvent,
+  DiceEventTarget,
+  GrowthLabel,
+  GrowthTargetKind,
+} from '@/logmake/types'
 
 /**
  * createCocGrowth の設定オプション。
@@ -19,7 +23,7 @@ export interface CocGrowthConfig {
   classifyRefinedSuccess: (params: {
     outcome: string
     cocOption: string
-    target: DiceEventTarget
+    target?: DiceEventTarget
     defaultSkillValues: DefaultSkillValueMap
   }) => GrowthLabel
 }
@@ -38,38 +42,161 @@ export function createCocGrowth(config: CocGrowthConfig): GrowthCapability {
     async loadDefaultSkillValues() {
       return normalizeDefaultSkillValues(config.rawDefaultSkillValues)
     },
-    classifyRecord({ defaultSkillValues, dice, target }) {
-      const outcome = target.outcomeText ?? dice.outcomeText
+    classifyEvent({ defaultSkillValues, roll }) {
+      const dice = roll.dice
+      if (!COC_GROWTH_OUTCOME_REGEX.test(dice.outcomeText)) {
+        return null
+      }
+
+      const outcome = dice.outcomeText
       const cocOption = readCocOption(dice.meta)
       const isCritical =
         /クリティカル|決定的成功/.test(outcome) || cocOption === 'c'
       const isFumble = /ファンブル|致命的失敗/.test(outcome)
       const isSuccess = config.successRegex.test(outcome) || isCritical
+      const targetKind = classifyTargetKind(dice)
+      const targetNames = readTargetNames(dice)
+      const initialSuccessTargetNames = dice.targets
+        .filter((target) =>
+          isInitialSuccessTarget(dice, target, defaultSkillValues)
+        )
+        .map((target) => target.name)
 
       if (isCritical) {
-        return 'クリティカル'
+        return createClassification({
+          label: 'クリティカル',
+          dice,
+          targetKind,
+          targetNames,
+          initialSuccessTargetNames,
+        })
+      }
+
+      if (isSuccess) {
+        const refinedLabel = config.classifyRefinedSuccess({
+          outcome,
+          cocOption,
+          target: dice.targets[0],
+          defaultSkillValues,
+        })
+        if (refinedLabel !== '通常成功') {
+          return createClassification({
+            label: refinedLabel,
+            dice,
+            targetKind,
+            targetNames,
+            initialSuccessTargetNames,
+          })
+        }
       }
 
       if (isFumble) {
-        return 'ファンブル'
+        return createClassification({
+          label: 'ファンブル',
+          dice,
+          targetKind,
+          targetNames,
+          initialSuccessTargetNames,
+        })
       }
 
       if (/故障/.test(outcome)) {
-        return '故障'
+        return createClassification({
+          label: '故障',
+          dice,
+          targetKind,
+          targetNames,
+          initialSuccessTargetNames,
+        })
       }
 
       if (!isSuccess) {
-        return '通常失敗'
+        return createClassification({
+          label: '通常失敗',
+          dice,
+          targetKind,
+          targetNames,
+          initialSuccessTargetNames,
+        })
       }
 
-      if (isInitialSkillSuccess(target, defaultSkillValues)) {
-        return '初期値成功'
+      if (initialSuccessTargetNames.length > 0) {
+        return createClassification({
+          label: '初期値成功',
+          dice,
+          targetKind,
+          targetNames,
+          initialSuccessTargetNames,
+        })
       }
 
-      return config.classifyRefinedSuccess({ outcome, cocOption, target, defaultSkillValues })
-    },
-    isGrowthTarget(dice: DiceEvent): boolean {
-      return dice.targets.length > 0 && COC_GROWTH_OUTCOME_REGEX.test(dice.outcomeText)
+      return createClassification({
+        label: '通常成功',
+        dice,
+        targetKind,
+        targetNames,
+        initialSuccessTargetNames,
+      })
     },
   }
+}
+
+function createClassification(params: {
+  label: GrowthLabel
+  dice: DiceEvent
+  targetKind: GrowthTargetKind
+  targetNames: string[]
+  initialSuccessTargetNames: string[]
+}): GrowthClassification {
+  return {
+    label: params.label,
+    targetNames: params.targetNames,
+    initialSuccessTargetNames: params.initialSuccessTargetNames,
+    status: params.dice.status,
+    targetKind: params.targetKind,
+  }
+}
+
+function readTargetNames(dice: DiceEvent): string[] {
+  if (dice.targets.length > 0) {
+    return dice.targets.map((target) => target.name)
+  }
+
+  return [dice.command]
+}
+
+function classifyTargetKind(dice: DiceEvent): GrowthTargetKind {
+  if (/^1d100/i.test(dice.command) && dice.targets.length === 0) {
+    return 'genericD100'
+  }
+  if (/^S?RESB?\(/i.test(dice.command)) {
+    return 'resistance'
+  }
+  if (/^S?CBRB?\(/i.test(dice.command) && dice.targets.length === 0) {
+    return 'combination'
+  }
+  if (dice.targets.some((target) => target.judge === null)) {
+    return 'freeText'
+  }
+  return 'known'
+}
+
+function isInitialSuccessTarget(
+  dice: DiceEvent,
+  target: DiceEventTarget,
+  defaultSkillValues: DefaultSkillValueMap,
+): boolean {
+  return (
+    isTargetSuccess(dice, target) &&
+    target.target !== undefined &&
+    defaultSkillValues[target.name] === target.target
+  )
+}
+
+function isTargetSuccess(dice: DiceEvent, target: DiceEventTarget): boolean {
+  const outcome =
+    target.outcomeText ?? (dice.targets.length === 1 ? dice.outcomeText : '')
+  return /クリティカル|決定的成功|スペシャル|イクストリーム成功|ハード成功|成功/.test(
+    outcome,
+  )
 }

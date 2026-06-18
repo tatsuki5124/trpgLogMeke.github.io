@@ -15,9 +15,9 @@ const SKILL_ALIASES: Record<string, string> = {
 }
 
 const parseCoc6DiceToken = createCocDiceExtractor({
-  commandPrefix: '(?:CCB|CC|RESB|RES|CBRB|CBR)',
-  optionRegex: /(?:CCB|CC|RESB|RES|CBRB|CBR)[-+0-9()]*&lt;=\d+([crhe])/i,
-  combineCommandPattern: /^CBRB?\((\d+)\s*,\s*(\d+)\)/i,
+  commandPrefix: '(?:S?(?:CCB|CC|RESB|RES|CBRB|CBR))',
+  optionRegex: /S?(?:CCB|CC|RESB|RES|CBRB|CBR)[-+0-9()]*(?:&lt;=|<=)\d+([crhe])/i,
+  combineCommandPattern: /^S?CBRB?\((\d+)\s*,\s*(\d+)\)/i,
   skillAliases: SKILL_ALIASES,
 })
 
@@ -48,9 +48,9 @@ export const COC6_SYSTEM: LogmakeSystem = {
   log: {
     normalizeSource: createLogSourceNormalizer({
       multiRollRegex:
-        /(?:x|rep|repeat)\d+( |\u3000)(CCB|CC|RESB|RES|CBRB|CBR)(.*)\s+#\d+\n(.*)(\n\n+#\d+\n(.*))+(クリティカル|決定的成功|スペシャル|成功|失敗|ファンブル|致命的失敗)/gi,
+        /(?:x|rep|repeat)\d+( |\u3000)(S?(?:CCB|CC|RESB|RES|CBRB|CBR))(.*)\s+#\d+\n(.*)(\n\n+#\d+\n(.*))+(クリティカル|決定的成功|スペシャル|成功|失敗|ファンブル|致命的失敗|部分的成功)/gi,
       skillMultiRollRegex:
-        /(?:x|rep|repeat)\d+( |\u3000)(CCB|CC|RESB|RES|CBRB|CBR)[-+0-9()]*&lt;=(\d+[crhe]*) 【(.*)】\s+#\d+\n/i,
+        /(?:x|rep|repeat)\d+( |\u3000)(S?(?:CCB|CC|RESB|RES|CBRB|CBR))[-+0-9()]*(?:&lt;=|<=)(\d+[crhe]*) 【(.*)】\s+#\d+\n/i,
     }),
     parseToken: parseCoc6DiceToken,
   },

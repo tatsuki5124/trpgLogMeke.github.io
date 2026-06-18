@@ -27,8 +27,9 @@ export function buildGrowthSummaryText(
       const records = entriesByLabel[label] ?? []
       const visibleRecords = records.filter(
         (record) =>
-          visibleTabs[record.tabName] !== false &&
-          (filters.visibility.status || !record.status),
+          visibleTabs[record.roll.tabName] !== false &&
+          (filters.visibility.status || !record.status) &&
+          (filters.visibility.unknownSkill || record.targetKind === 'known'),
       )
 
       if (visibleRecords.length === 0) {
@@ -37,10 +38,12 @@ export function buildGrowthSummaryText(
 
       lines.push(`◯${label}`)
       for (const record of visibleRecords) {
+        const targetText =
+          record.targetNames.join(', ') || record.roll.dice.command
         const parts = [
-          filters.visibility.tabName ? `[${record.tabName}]` : '',
-          record.ginou,
-          filters.visibility.value ? `＞ ${record.value}` : '',
+          filters.visibility.tabName ? `[${record.roll.tabName}]` : '',
+          targetText,
+          filters.visibility.value ? `＞ ${record.roll.value}` : '',
         ].filter(Boolean)
         lines.push(parts.join(' '))
       }

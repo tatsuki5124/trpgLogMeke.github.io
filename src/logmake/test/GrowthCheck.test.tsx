@@ -9,12 +9,58 @@ const mockAnalysis: GrowthAnalysis = {
   byCharacter: {
     'テストキャラ': {
       '初期値成功': [
-        { charName: 'テストキャラ', tabName: '雑談', ginou: '図書館', value: 45, status: true, label: '初期値成功' },
+        {
+          id: 'entry-0-dice-0-0-growth',
+          roll: {
+            id: 'entry-0-dice-0-0',
+            entryId: 'entry-0',
+            charName: 'テストキャラ',
+            tabName: '雑談',
+            value: 45,
+            dice: {
+              rawText: 'CCB&lt;=45 図書館 ＞ 45 ＞ 成功',
+              command: 'CCB&lt;=45',
+              outcomeText: '成功',
+              primaryRoll: 45,
+              rolls: [45],
+              targets: [],
+              status: true,
+            },
+          },
+          targetNames: ['図書館'],
+          initialSuccessTargetNames: ['図書館'],
+          targetKind: 'known',
+          status: true,
+          label: '初期値成功',
+        },
       ],
     },
   },
   records: [
-    { charName: 'テストキャラ', tabName: '雑談', ginou: '図書館', value: 45, status: true, label: '初期値成功' },
+    {
+      id: 'entry-0-dice-0-0-growth',
+      roll: {
+        id: 'entry-0-dice-0-0',
+        entryId: 'entry-0',
+        charName: 'テストキャラ',
+        tabName: '雑談',
+        value: 45,
+        dice: {
+          rawText: 'CCB&lt;=45 図書館 ＞ 45 ＞ 成功',
+          command: 'CCB&lt;=45',
+          outcomeText: '成功',
+          primaryRoll: 45,
+          rolls: [45],
+          targets: [],
+          status: true,
+        },
+      },
+      targetNames: ['図書館'],
+      initialSuccessTargetNames: ['図書館'],
+      targetKind: 'known',
+      status: true,
+      label: '初期値成功',
+    },
   ],
   warnings: [],
 }
@@ -33,6 +79,7 @@ describe('GrowthCheck', () => {
     render(<GrowthCheck analysis={mockAnalysis} tabs={{}} />)
 
     expect(screen.getByTestId('growth-summary')).toBeInTheDocument()
+    expect(screen.getByLabelText('技能不明')).toBeInTheDocument()
   })
 
   it('details/summary ラッパーを持たない', () => {

@@ -1,15 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
 import { buildGrowthSummaryText } from '@/logmake/lib/buildGrowthSummaryText'
-import type { DiceRecord, GrowthAnalysis, GrowthFilters } from '@/logmake/types'
+import type { GrowthAnalysis, GrowthFilters, GrowthRecord } from '@/logmake/types'
 
 const record = (
-  overrides: Partial<DiceRecord> & Pick<DiceRecord, 'ginou' | 'label'>
-): DiceRecord => ({
-  charName: '探索者A',
-  tabName: 'メイン',
-  value: 1,
+  overrides: Partial<GrowthRecord> & Pick<GrowthRecord, 'label' | 'targetNames'>
+): GrowthRecord => ({
+  id: 'entry-0-dice-0-0-growth',
+  roll: {
+    id: 'entry-0-dice-0-0',
+    entryId: 'entry-0',
+    charName: '探索者A',
+    tabName: 'メイン',
+    value: 1,
+    dice: {
+      rawText: 'CCB&lt;=1 【目星】 (1D100&lt;=1) ＞ 1 ＞ 成功',
+      command: 'CCB&lt;=1',
+      outcomeText: '成功',
+      primaryRoll: 1,
+      rolls: [1],
+      targets: [],
+      status: false,
+    },
+  },
   status: false,
+  initialSuccessTargetNames: [],
+  targetKind: 'known',
   ...overrides,
 })
 
@@ -29,6 +45,7 @@ const filters: GrowthFilters = {
     tabName: true,
     value: true,
     status: true,
+    unknownSkill: false,
   },
 }
 
@@ -41,10 +58,17 @@ describe('buildGrowthSummaryText', () => {
       byCharacter: {
         探索者A: {
           初期値成功: [
-            record({ ginou: '目星', label: '初期値成功', value: 25 }),
+            record({
+              targetNames: ['目星'],
+              label: '初期値成功',
+              roll: {
+                ...record({ targetNames: ['目星'], label: '初期値成功' }).roll,
+                value: 25,
+              },
+            }),
           ],
           クリティカル: [
-            record({ ginou: '聞き耳', label: 'クリティカル', value: 1 }),
+            record({ targetNames: ['聞き耳'], label: 'クリティカル' }),
           ],
         },
       },
@@ -62,7 +86,7 @@ describe('buildGrowthSummaryText', () => {
     )
   })
 
-  it('applies label, tab, status, and column visibility filters', () => {
+  it('applies label, tab, status, unknown skill, and column visibility filters', () => {
     const analysis: GrowthAnalysis = {
       labels: ['初期値成功', '通常成功', '通常失敗'],
       warnings: [],
@@ -70,22 +94,29 @@ describe('buildGrowthSummaryText', () => {
       byCharacter: {
         探索者A: {
           初期値成功: [
-            record({ ginou: '目星', label: '初期値成功', value: 25 }),
+            record({ targetNames: ['目星'], label: '初期値成功' }),
           ],
           通常成功: [
             record({
-              ginou: '図書館',
+              targetNames: ['図書館'],
               label: '通常成功',
-              tabName: '雑談',
-              value: 42,
+              roll: {
+                ...record({ targetNames: ['図書館'], label: '通常成功' }).roll,
+                tabName: '雑談',
+                value: 42,
+              },
             }),
           ],
           通常失敗: [
             record({
-              ginou: 'POW',
+              targetNames: ['POW'],
               label: '通常失敗',
               status: true,
-              value: 60,
+            }),
+            record({
+              targetNames: ['CBR(50,40)'],
+              label: '通常失敗',
+              targetKind: 'combination',
             }),
           ],
         },
@@ -100,6 +131,7 @@ describe('buildGrowthSummaryText', () => {
         tabName: false,
         value: false,
         status: false,
+        unknownSkill: false,
       },
     }
 
@@ -111,6 +143,37 @@ describe('buildGrowthSummaryText', () => {
     ).toBe(['＜探索者A＞', '◯初期値成功', '目星'].join('\n'))
   })
 
+  it('shows unknown skill records only when the option is enabled', () => {
+    const analysis: GrowthAnalysis = {
+      labels: ['通常失敗'],
+      warnings: [],
+      records: [],
+      byCharacter: {
+        探索者A: {
+          通常失敗: [
+            record({
+              targetNames: ['1d100&lt;=50'],
+              label: '通常失敗',
+              targetKind: 'genericD100',
+            }),
+          ],
+        },
+      },
+    }
+
+    expect(buildGrowthSummaryText(analysis, filters, { メイン: true })).toBe('')
+    expect(
+      buildGrowthSummaryText(
+        analysis,
+        {
+          ...filters,
+          visibility: { ...filters.visibility, unknownSkill: true },
+        },
+        { メイン: true },
+      )
+    ).toBe(['＜探索者A＞', '◯通常失敗', '[メイン] 1d100&lt;=50 ＞ 1'].join('\n'))
+  })
+
   it('returns an empty string when no records remain visible', () => {
     const analysis: GrowthAnalysis = {
       labels: ['通常成功'],
@@ -120,10 +183,13 @@ describe('buildGrowthSummaryText', () => {
         探索者A: {
           通常成功: [
             record({
-              ginou: '図書館',
+              targetNames: ['図書館'],
               label: '通常成功',
-              tabName: '雑談',
-              value: 42,
+              roll: {
+                ...record({ targetNames: ['図書館'], label: '通常成功' }).roll,
+                tabName: '雑談',
+                value: 42,
+              },
             }),
           ],
         },
