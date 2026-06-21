@@ -7,7 +7,7 @@ import { normalizeDefaultSkillValues } from '@/logmake/lib/defaultSkillValues'
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
 import type {
   DiceEvent,
-  DiceEventTarget,
+  JudgmentTarget,
   GrowthLabel,
   GrowthTargetKind,
 } from '@/logmake/types'
@@ -23,7 +23,7 @@ export interface CocGrowthConfig {
   classifyRefinedSuccess: (params: {
     outcome: string
     cocOption: string
-    target?: DiceEventTarget
+    target?: JudgmentTarget
     defaultSkillValues: DefaultSkillValueMap
   }) => GrowthLabel
 }
@@ -167,7 +167,7 @@ function readTargetNames(dice: DiceEvent): string[] {
 
 function classifyTargetKind(dice: DiceEvent): GrowthTargetKind {
   if (/^1d100/i.test(dice.command) && dice.targets.length === 0) {
-    return 'genericD100'
+    return 'rawD100'
   }
   if (/^S?RESB?\(/i.test(dice.command)) {
     return 'resistance'
@@ -176,14 +176,14 @@ function classifyTargetKind(dice: DiceEvent): GrowthTargetKind {
     return 'combination'
   }
   if (dice.targets.some((target) => target.judge === null)) {
-    return 'freeText'
+    return 'unlistedSkill'
   }
-  return 'known'
+  return 'listedSkill'
 }
 
 function isInitialSuccessTarget(
   dice: DiceEvent,
-  target: DiceEventTarget,
+  target: JudgmentTarget,
   defaultSkillValues: DefaultSkillValueMap,
 ): boolean {
   return (
@@ -193,7 +193,7 @@ function isInitialSuccessTarget(
   )
 }
 
-function isTargetSuccess(dice: DiceEvent, target: DiceEventTarget): boolean {
+function isTargetSuccess(dice: DiceEvent, target: JudgmentTarget): boolean {
   const outcome =
     target.outcomeText ?? (dice.targets.length === 1 ? dice.outcomeText : '')
   return /クリティカル|決定的成功|スペシャル|イクストリーム成功|ハード成功|成功/.test(

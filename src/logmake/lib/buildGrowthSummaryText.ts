@@ -29,7 +29,7 @@ export function buildGrowthSummaryText(
         (record) =>
           visibleTabs[record.roll.tabName] !== false &&
           (filters.visibility.status || !record.status) &&
-          (filters.visibility.unknownSkill || record.targetKind === 'known'),
+          (filters.visibility.unknownSkill || record.targetKind === 'listedSkill'),
       )
 
       if (visibleRecords.length === 0) {

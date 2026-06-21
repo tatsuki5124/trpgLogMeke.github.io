@@ -2,9 +2,9 @@ import {
   canonicalizeTargetName,
   classifyCocHighlight,
   cleanSkillTail,
-  createDiceEventTarget,
+  createJudgmentTarget,
 } from '@/logmake/systems/coc/shared'
-import type { DiceEvent, DiceEventTarget } from '@/logmake/types'
+import type { DiceEvent, JudgmentTarget } from '@/logmake/types'
 
 /**
  * createCocDiceExtractor の設定オプション。
@@ -185,7 +185,7 @@ function parseDiceResult(
 }
 
 /**
- * コマンド・テール・パートアウトカムから DiceEventTarget の配列を構築する。
+ * コマンド・テール・パートアウトカムから JudgmentTarget の配列を構築する。
  * ブラケット形式・複合コマンド・単一技能など複数の記法に対応する。
  *
  * @param command - ダイスコマンド文字列
@@ -199,7 +199,7 @@ function parseDiceTargets(
   rawTail: string,
   partOutcomes: string[],
   config: CocDiceExtractorConfig
-): DiceEventTarget[] {
+): JudgmentTarget[] {
   const tail = cleanSkillTail(rawTail)
   if (!tail) {
     return []
@@ -216,7 +216,7 @@ function parseDiceTargets(
       bracketOnlyMatch[1],
       config.skillAliases
     )
-    return [createDiceEventTarget(name, commandTargets[0])]
+    return [createJudgmentTarget(name, commandTargets[0])]
   }
 
   if (commandTargets.length > 1) {
@@ -227,7 +227,7 @@ function parseDiceTargets(
 
     if (parts.length === commandTargets.length) {
       return parts.map((name, index) =>
-        createDiceEventTarget(name, commandTargets[index], partOutcomes[index])
+        createJudgmentTarget(name, commandTargets[index], partOutcomes[index])
       )
     }
 
@@ -239,7 +239,7 @@ function parseDiceTargets(
   }
 
   return [
-    createDiceEventTarget(
+    createJudgmentTarget(
       canonicalizeTargetName(tail, config.skillAliases),
       commandTargets[0]
     ),

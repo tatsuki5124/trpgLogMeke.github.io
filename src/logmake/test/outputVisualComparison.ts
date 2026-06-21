@@ -12,8 +12,8 @@ import type {
   ContentToken,
   LogmakeSettings,
   OutputModel,
-  OutputSection,
-  OutputSpeakerEntry,
+  OutputTabSection,
+  OutputEntry,
   ParsedLog,
 } from '@/logmake/types'
 
@@ -252,7 +252,7 @@ function renderStructuredToggle(tab: OutputModel['toggles'][number]): string {
 }
 
 function renderStructuredSection(
-  section: OutputSection,
+  section: OutputTabSection,
   index: number,
   options: StructuredComparisonVariantOptions,
   settings: LogmakeSettings,
@@ -269,7 +269,7 @@ function renderStructuredSection(
     ? ''
     : `    <span class="log-section-tab-name" aria-hidden="true">${escapeText(section.tabName)}</span>\n`
   const entries = section.entries
-    .map((entry) => renderStructuredSpeaker(entry, options, settings))
+    .map((entry) => renderStructuredEntry(entry, options, settings))
     .join('\n')
 
   return `<section class="${className}"${ariaAttr}>
@@ -278,8 +278,8 @@ ${tabNameLabel}    ${entries}
 </section>`
 }
 
-function renderStructuredSpeaker(
-  entry: OutputSpeakerEntry,
+function renderStructuredEntry(
+  entry: OutputEntry,
   options: StructuredComparisonVariantOptions,
   settings: LogmakeSettings,
 ): string {

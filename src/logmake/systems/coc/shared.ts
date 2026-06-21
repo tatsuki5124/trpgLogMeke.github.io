@@ -1,5 +1,5 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
-import type { DiceEventTarget, DiceHighlight } from '@/logmake/types'
+import type { JudgmentTarget, DiceHighlight } from '@/logmake/types'
 
 const TAG_REGEX = /<[^>]+>/g
 
@@ -18,19 +18,19 @@ export function cleanSkillTail(tail: string): string {
 }
 
 /**
- * DiceEventTarget オブジェクトを生成する。
+ * JudgmentTarget オブジェクトを生成する。
  * target が未定義の場合は judge を null にする。
  *
  * @param name - 技能名
  * @param target - 目標値（目標値なしの場合は undefined）
  * @param outcomeText - この目標に対する個別アウトカムテキスト
- * @returns 生成した DiceEventTarget
+ * @returns 生成した JudgmentTarget
  */
-export function createDiceEventTarget(
+export function createJudgmentTarget(
   name: string,
   target: number | undefined,
   outcomeText?: string,
-): DiceEventTarget {
+): JudgmentTarget {
   return {
     name,
     judge: target === undefined ? null : `&lt;=${target} 【${name}】`,
@@ -66,12 +66,12 @@ export function classifyCocHighlight(
 /**
  * 判定対象の目標値がデフォルト技能値と一致するか（＝初期値成功）を判定する。
  *
- * @param target - 判定対象の DiceEventTarget
+ * @param target - 判定対象の JudgmentTarget
  * @param defaultSkillValues - 技能初期値マップ
  * @returns 初期値成功なら true
  */
 export function isInitialSkillSuccess(
-  target: DiceEventTarget,
+  target: JudgmentTarget,
   defaultSkillValues: DefaultSkillValueMap,
 ): boolean {
   return (

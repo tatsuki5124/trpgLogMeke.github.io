@@ -2,7 +2,7 @@ import { isPrimaryTab } from '@/logmake/lib/defaults'
 import type {
   BuildOutputOptions,
   OutputModel,
-  OutputSection,
+  OutputTabSection,
   ParsedLog,
 } from '@/logmake/types'
 
@@ -18,7 +18,7 @@ export function buildOutputModel(
   parsedLog: ParsedLog,
   options: BuildOutputOptions
 ): OutputModel {
-  const sections: OutputSection[] = []
+  const sections: OutputTabSection[] = []
   const tabVisibilityClasses = createTabVisibilityClasses(options.tabs)
   const toggles = Object.values(options.tabs)
     .filter((tab) => !isPrimaryTab(tab.name) && tab.visible)

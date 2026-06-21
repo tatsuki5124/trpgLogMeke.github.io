@@ -10,8 +10,8 @@ import type {
   ContentToken,
   LogmakeSettings,
   OutputModel,
-  OutputSection,
-  OutputSpeakerEntry,
+  OutputTabSection,
+  OutputEntry,
 } from '@/logmake/types'
 
 /**
@@ -49,7 +49,7 @@ export function buildOutputHtml(
 </p>`
   }
 
-  function renderSpeaker(entry: OutputSpeakerEntry): string {
+  function renderEntry(entry: OutputEntry): string {
     const speakerColor = sanitizeCssColor(entry.color)
     const paragraphs = entry.paragraphs.map(renderParagraph).join('\n')
 
@@ -73,7 +73,7 @@ export function buildOutputHtml(
 </div>`
   }
 
-  function renderSection(section: OutputSection, index: number): string {
+  function renderSection(section: OutputTabSection, index: number): string {
     const sectionTitleId = `log-section-${index}-title`
     const isPrimary = isPrimaryTab(section.tabName)
     const className = isPrimary
@@ -92,7 +92,7 @@ export function buildOutputHtml(
       ? ''
       : `    <span class="log-section-tab-name" aria-hidden="true">${escapeText(section.tabName)}</span>\n`
 
-    const entries = section.entries.map(renderSpeaker).join('\n')
+    const entries = section.entries.map(renderEntry).join('\n')
 
     return `<section class="${className}"${style}${ariaAttr}>
     <h2 id="${sectionTitleId}" class="log-section-title">${escapeText(section.tabName)}</h2>

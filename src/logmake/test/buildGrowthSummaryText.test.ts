@@ -25,7 +25,7 @@ const record = (
   },
   status: false,
   initialSuccessTargetNames: [],
-  targetKind: 'known',
+  targetKind: 'listedSkill',
   ...overrides,
 })
 
@@ -154,7 +154,7 @@ describe('buildGrowthSummaryText', () => {
             record({
               targetNames: ['1d100&lt;=50'],
               label: '通常失敗',
-              targetKind: 'genericD100',
+              targetKind: 'rawD100',
             }),
           ],
         },

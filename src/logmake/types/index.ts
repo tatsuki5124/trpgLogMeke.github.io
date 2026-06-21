@@ -59,7 +59,7 @@ export interface CharacterConfig {
  * ダイスロールの判定対象（技能・能力値など）。
  * 複合コマンドの場合は DiceEvent.targets に複数格納される。
  */
-export interface DiceEventTarget {
+export interface JudgmentTarget {
   name: string
   judge: string | null
   outcomeText?: string
@@ -76,7 +76,7 @@ export interface DiceEvent {
   outcomeText: string
   primaryRoll: number | null
   rolls: number[]
-  targets: DiceEventTarget[]
+  targets: JudgmentTarget[]
   status: boolean
   highlight?: DiceHighlight
   meta?: Record<string, unknown>
@@ -140,11 +140,11 @@ export interface DiceRollAnalysis {
 
 /** 成長チェック上の判定対象種別 */
 export type GrowthTargetKind =
-  | 'known'
-  | 'genericD100'
+  | 'listedSkill'
+  | 'rawD100'
   | 'resistance'
   | 'combination'
-  | 'freeText'
+  | 'unlistedSkill'
 
 /** 成長判定の1件分の表示レコード */
 export interface GrowthRecord {
@@ -186,7 +186,7 @@ export interface GrowthFilters {
 }
 
 /** 出力 HTML におけるひとりのキャラクターの発言ブロック */
-export interface OutputSpeakerEntry {
+export interface OutputEntry {
   charName: string
   color: string
   style: CharacterStyle
@@ -197,12 +197,12 @@ export interface OutputSpeakerEntry {
  * 出力 HTML におけるひとつのタブセクション。
  * entries に発言ブロックの配列を持つ。
  */
-export interface OutputSection {
+export interface OutputTabSection {
   tabName: string
   tabColor: string
   /** 出力 HTML 内のタブ表示切替に使う安全な CSS class */
   tabVisibilityClass: string
-  entries: OutputSpeakerEntry[]
+  entries: OutputEntry[]
 }
 
 /** タブ表示切り替えチェックボックスの情報 */
@@ -220,7 +220,7 @@ export interface OutputToggle {
  * buildOutputHtml に渡す中間表現。
  */
 export interface OutputModel {
-  sections: OutputSection[]
+  sections: OutputTabSection[]
   toggles: OutputToggle[]
 }
 

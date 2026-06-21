@@ -117,8 +117,8 @@ describe('analyzeGrowth', () => {
     const analysis = analyzeGrowth(analyzeDiceRolls(parsed), COC6_SYSTEM, {})
 
     expect(analysis.records.map((record) => record.targetKind)).toEqual([
-      'known',
-      'genericD100',
+      'listedSkill',
+      'rawD100',
       'combination',
     ])
   })
@@ -155,7 +155,7 @@ describe('analyzeGrowth', () => {
       '通常失敗',
     ])
     expect(analysis.records.map((record) => record.targetKind)).toEqual([
-      'known',
+      'listedSkill',
       'resistance',
       'combination',
     ])
