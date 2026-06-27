@@ -10,7 +10,7 @@ import type {
   DiceEvent,
   JudgmentTarget,
   GrowthLabel,
-  GrowthTargetKind,
+  GrowthKind,
 } from '@/logmake/types'
 
 /**
@@ -144,7 +144,7 @@ export function createCocGrowth(config: CocGrowthConfig): GrowthCapability {
 function createClassification(params: {
   label: GrowthLabel
   dice: DiceEvent
-  targetKind: GrowthTargetKind
+  targetKind: GrowthKind
   targetNames: string[]
   initialSuccessTargetNames: string[]
 }): GrowthClassification {
@@ -165,7 +165,7 @@ function readTargetNames(dice: DiceEvent): string[] {
   return [dice.command]
 }
 
-function classifyTargetKind(dice: DiceEvent): GrowthTargetKind {
+function classifyTargetKind(dice: DiceEvent): GrowthKind {
   if (/^1d100/i.test(dice.command) && dice.targets.length === 0) {
     return 'rawD100'
   }

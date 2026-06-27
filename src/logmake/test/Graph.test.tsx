@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Graph } from '@/logmake/components/features/Graph'
-import type { DiceRollAnalysis } from '@/logmake/types'
+import type { DiceAnalysis } from '@/logmake/types'
 
 vi.mock('react-chartjs-2', async () => {
   const { forwardRef } = await vi.importActual<typeof import('react')>('react')
@@ -17,7 +17,7 @@ vi.mock('react-chartjs-2', async () => {
   }
 })
 
-const rollAnalysis: DiceRollAnalysis = {
+const rollAnalysis: DiceAnalysis = {
   records: [
     {
       id: 'entry-0-dice-0-0',
@@ -54,7 +54,7 @@ const rollAnalysis: DiceRollAnalysis = {
 rollAnalysis.byCharacter = { 探索者A: rollAnalysis.records }
 
 describe('Graph', () => {
-  it('uses DiceRollAnalysis and keeps graph tab visibility separate from TabConfig.visible', () => {
+  it('uses DiceAnalysis and keeps graph tab visibility separate from TabConfig.visible', () => {
     const tabs = {
       メイン: { name: 'メイン', color: '#fff', visible: false },
       雑談: { name: '雑談', color: '#ccc', visible: true },

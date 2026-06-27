@@ -13,7 +13,7 @@ import { GRAPH_LABELS, graphBuckets } from '@/logmake/lib/graphBuckets'
 import formStyles from '@/logmake/styles/forms.module.css'
 import type {
   CharacterConfig,
-  DiceRollAnalysis,
+  DiceAnalysis,
   TabConfig,
 } from '@/logmake/types'
 
@@ -22,7 +22,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend)
 type GraphType = 'grouped' | 'stacked'
 
 interface GraphProps {
-  rollAnalysis: DiceRollAnalysis | null
+  rollAnalysis: DiceAnalysis | null
   characters: Record<string, CharacterConfig>
   tabs: Record<string, TabConfig>
 }

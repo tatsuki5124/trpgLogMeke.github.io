@@ -4,7 +4,7 @@ import type {
   DiceTokenResult,
   GameSystem,
   GrowthLabel,
-  GrowthTargetKind,
+  GrowthKind,
 } from '@/logmake/types'
 
 /** GrowthCapability.classifyEvent に渡す判定オプション */
@@ -19,7 +19,7 @@ export interface GrowthClassification {
   targetNames: string[]
   initialSuccessTargetNames: string[]
   status: boolean
-  targetKind: GrowthTargetKind
+  targetKind: GrowthKind
 }
 
 /**

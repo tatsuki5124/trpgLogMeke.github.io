@@ -124,7 +124,7 @@ export interface ParsedLog {
 }
 
 /** グラフ・成長判定が共有する、採用出目1件分のレコード */
-export interface DiceRollRecord {
+export interface DiceRecord {
   id: string
   entryId: string
   charName: string
@@ -134,14 +134,14 @@ export interface DiceRollRecord {
 }
 
 /** ログ全体の採用出目分析結果 */
-export interface DiceRollAnalysis {
-  byCharacter: Record<string, DiceRollRecord[]>
-  records: DiceRollRecord[]
+export interface DiceAnalysis {
+  byCharacter: Record<string, DiceRecord[]>
+  records: DiceRecord[]
   warnings: string[]
 }
 
 /** 成長チェック上の判定対象種別 */
-export type GrowthTargetKind =
+export type GrowthKind =
   | 'listedSkill'
   | 'rawD100'
   | 'resistance'
@@ -151,12 +151,12 @@ export type GrowthTargetKind =
 /** 成長判定の1件分の表示レコード */
 export interface GrowthRecord {
   id: string
-  roll: DiceRollRecord
+  roll: DiceRecord
   status: boolean
   label: GrowthLabel
   targetNames: string[]
   initialSuccessTargetNames: string[]
-  targetKind: GrowthTargetKind
+  targetKind: GrowthKind
 }
 
 /**

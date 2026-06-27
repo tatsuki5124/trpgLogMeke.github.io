@@ -1,6 +1,6 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
 import type { LogmakeSystem } from '@/logmake/systems'
-import type { DiceRollAnalysis, GrowthAnalysis, GrowthRecord } from '@/logmake/types'
+import type { DiceAnalysis, GrowthAnalysis, GrowthRecord } from '@/logmake/types'
 
 /**
  * 採用出目分析結果から成長判定レコードを集約し、分析結果を返す。
@@ -12,7 +12,7 @@ import type { DiceRollAnalysis, GrowthAnalysis, GrowthRecord } from '@/logmake/t
  * @returns 成長判定の集約結果
  */
 export function analyzeGrowth(
-  rollAnalysis: DiceRollAnalysis,
+  rollAnalysis: DiceAnalysis,
   system: LogmakeSystem,
   defaultSkillValues: DefaultSkillValueMap,
 ): GrowthAnalysis {

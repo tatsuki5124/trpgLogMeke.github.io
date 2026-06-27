@@ -1,4 +1,4 @@
-import type { DiceRollAnalysis, DiceRollRecord, ParsedLog } from '@/logmake/types'
+import type { DiceAnalysis, DiceRecord, ParsedLog } from '@/logmake/types'
 
 /**
  * パース済みログから、採用出目1件ごとのレコードを抽出する。
@@ -7,9 +7,9 @@ import type { DiceRollAnalysis, DiceRollRecord, ParsedLog } from '@/logmake/type
  * @param parsedLog - parseLogHtml の戻り値
  * @returns グラフや成長判定の土台になる出目分析結果
  */
-export function analyzeDiceRolls(parsedLog: ParsedLog): DiceRollAnalysis {
-  const records: DiceRollRecord[] = []
-  const byCharacter: DiceRollAnalysis['byCharacter'] = {}
+export function analyzeDiceRolls(parsedLog: ParsedLog): DiceAnalysis {
+  const records: DiceRecord[] = []
+  const byCharacter: DiceAnalysis['byCharacter'] = {}
 
   parsedLog.entries.forEach((entry) => {
     entry.paragraphs.forEach((paragraph, paragraphIndex) => {
@@ -19,7 +19,7 @@ export function analyzeDiceRolls(parsedLog: ParsedLog): DiceRollAnalysis {
           return
         }
 
-        const record: DiceRollRecord = {
+        const record: DiceRecord = {
           id: `${entry.id}-dice-${paragraphIndex}-${tokenIndex}`,
           entryId: entry.id,
           charName: entry.charName,
