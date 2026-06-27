@@ -11,6 +11,11 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     headless: true,
+    launchOptions: {
+      executablePath: process.env.PLAYWRIGHT_BROWSERS_PATH
+        ? '/opt/pw-browsers/chromium'
+        : undefined,
+    },
   },
   webServer: {
     command: 'pnpm dev --host 127.0.0.1 --port 4173',
