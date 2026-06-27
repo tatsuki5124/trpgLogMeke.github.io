@@ -88,7 +88,7 @@ describe('analyzeGrowth', () => {
     ).toEqual(['マーシャルアーツ'])
     expect(
       analysis.records.find((record) =>
-        record.roll.dice.outcomeText.includes('部分的成功')
+        record.roll.dice.resultText.includes('部分的成功')
       )?.initialSuccessTargetNames
     ).toEqual(['こぶし（パンチ）'])
   })
@@ -162,10 +162,10 @@ describe('analyzeGrowth', () => {
   })
 
   it('does not crash or infer initial success when CBRB part outcomes are missing', () => {
-    const dice = COC6_SYSTEM.log.parseToken(
+    const result = COC6_SYSTEM.log.parseToken(
       'CBRB(50,25) こぶし,組み付き ＞ 30 ＞ 部分的成功'
     )
-    expect(dice).toBeDefined()
+    expect(result).toBeDefined()
     const rollAnalysis = {
       records: [
         {
@@ -174,7 +174,7 @@ describe('analyzeGrowth', () => {
           charName: '探索者A',
           tabName: 'メイン',
           value: 30,
-          dice: dice!,
+          dice: result!.dice,
         },
       ],
       byCharacter: {},

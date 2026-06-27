@@ -29,7 +29,7 @@ export function analyzeGrowth(
   for (const roll of rollAnalysis.records) {
     const classification = growth.classifyEvent({
       defaultSkillValues,
-      roll,
+      dice: roll.dice,
     })
     if (!classification) {
       continue

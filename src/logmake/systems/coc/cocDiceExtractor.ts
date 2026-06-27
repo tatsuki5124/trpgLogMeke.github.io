@@ -4,7 +4,7 @@ import {
   cleanSkillTail,
   createJudgmentTarget,
 } from '@/logmake/systems/coc/shared'
-import type { DiceEvent, JudgmentTarget } from '@/logmake/types'
+import type { DiceTokenResult, JudgmentTarget } from '@/logmake/types'
 
 /**
  * createCocDiceExtractor の設定オプション。
@@ -21,39 +21,14 @@ export interface CocDiceExtractorConfig {
 interface ParsedCocDiceResult {
   kind: 'systemCommand' | 'genericD100'
   command: string
-  outcomeText: string
-  partOutcomes: string[]
+  resultText: string
+  partResults: string[]
   roll: number
   tail: string
 }
 
 const SKILL_SEPARATOR_REGEX = /[,，、]/
 const BRACKET_ONLY_SKILL_REGEX = /^【([^】]+)】$/
-/** SAN・能力値ロールなど、成長判定表示で切り分けたい特殊ステータス名 */
-const STATUS_TARGET_NAMES = new Set([
-  'SAN',
-  'SAN値チェック',
-  '正気度',
-  '正気度ロール',
-  'STR',
-  'CON',
-  'POW',
-  'DEX',
-  'APP',
-  'SIZ',
-  'INT',
-  'EDU',
-  'アイデア',
-  '幸運',
-  'ショックロール',
-  '知識',
-])
-const ABILITY_TARGET_NAMES = ['STR', 'CON', 'POW', 'DEX', 'APP', 'SIZ', 'INT', 'EDU'] as const
-const ABILITY_TARGET_PATTERN = ABILITY_TARGET_NAMES.join('|')
-const ABILITY_FACTOR_PATTERN = `(?:${ABILITY_TARGET_PATTERN})(?:[*×]\\d+)?`
-const ABILITY_EXPRESSION_REGEX = new RegExp(
-  `^(?:${ABILITY_FACTOR_PATTERN})(?:\\+(?:${ABILITY_FACTOR_PATTERN}))*$`
-)
 
 /**
  * CoC 汎用のダイスイベント抽出関数を生成するファクトリ。
@@ -61,16 +36,16 @@ const ABILITY_EXPRESSION_REGEX = new RegExp(
  * 複合コマンドや複数技能を持つロールも解析する。
  *
  * @param config - コマンドプレフィックス・オプション正規表現などの設定
- * @returns ログフラグメント文字列を受け取り DiceEvent を返す抽出関数
+ * @returns ログフラグメント文字列を受け取り DiceTokenResult を返す抽出関数
  */
 export function createCocDiceExtractor(
   config: CocDiceExtractorConfig
-): (fragment: string) => DiceEvent | undefined {
+): (fragment: string) => DiceTokenResult | undefined {
   const d100ResultRegex = createD100ResultRegex(config.commandPrefix)
   const genericD100ResultRegex = createGenericD100ResultRegex()
   const commandResultRegex = createCommandResultRegex(config.commandPrefix)
 
-  return function parseCocDiceToken(fragment: string): DiceEvent | undefined {
+  return function parseCocDiceToken(fragment: string): DiceTokenResult | undefined {
     const result = parseDiceResult(
       fragment,
       d100ResultRegex,
@@ -85,20 +60,20 @@ export function createCocDiceExtractor(
     const targets = parseDiceTargets(
       result.command,
       result.tail,
-      result.partOutcomes,
+      result.partResults,
       config
     )
 
     return {
-      rawText: fragment,
-      command: result.command,
-      outcomeText: result.outcomeText,
-      primaryRoll: result.roll,
-      rolls: [result.roll],
-      targets,
-      status: targets.some((target) => isStatusTargetName(target.name)),
-      highlight: classifyCocHighlight(result.outcomeText),
-      meta: cocOption ? { cocOption } : undefined,
+      dice: {
+        rawText: fragment,
+        command: result.command,
+        resultText: result.resultText,
+        primaryRoll: result.roll,
+        targets,
+        meta: cocOption ? { cocOption } : undefined,
+      },
+      highlight: classifyCocHighlight(result.resultText),
     }
   }
 }
@@ -132,10 +107,10 @@ function parseDiceResult(
     return {
       kind: 'systemCommand',
       roll: Number(roll),
-      outcomeText: outcome,
+      resultText: outcome,
       command,
       tail,
-      partOutcomes: [],
+      partResults: [],
     }
   }
 
@@ -153,10 +128,10 @@ function parseDiceResult(
     return {
       kind: 'genericD100',
       roll: Number(roll),
-      outcomeText: outcome,
+      resultText: outcome,
       command,
       tail,
-      partOutcomes: [],
+      partResults: [],
     }
   }
 
@@ -174,10 +149,10 @@ function parseDiceResult(
     return {
       kind: 'systemCommand',
       roll: Number(roll),
-      outcomeText: outcome,
+      resultText: outcome,
       command,
       tail,
-      partOutcomes: parsePartOutcomes(commandMatch.groups.parts),
+      partResults: parsePartResults(commandMatch.groups.parts),
     }
   }
 
@@ -185,19 +160,19 @@ function parseDiceResult(
 }
 
 /**
- * コマンド・テール・パートアウトカムから JudgmentTarget の配列を構築する。
+ * コマンド・テール・パートリザルトから JudgmentTarget の配列を構築する。
  * ブラケット形式・複合コマンド・単一技能など複数の記法に対応する。
  *
  * @param command - ダイスコマンド文字列
  * @param rawTail - 技能名部分の生テキスト
- * @param partOutcomes - 複合コマンド時の各部分アウトカム配列
+ * @param partResults - 複合コマンド時の各部分結果テキスト配列
  * @param config - 技能エイリアスや複合コマンドパターン
  * @returns 判定対象の配列
  */
 function parseDiceTargets(
   command: string,
   rawTail: string,
-  partOutcomes: string[],
+  partResults: string[],
   config: CocDiceExtractorConfig
 ): JudgmentTarget[] {
   const tail = cleanSkillTail(rawTail)
@@ -227,15 +202,15 @@ function parseDiceTargets(
 
     if (parts.length === commandTargets.length) {
       return parts.map((name, index) =>
-        createJudgmentTarget(name, commandTargets[index], partOutcomes[index])
+        createJudgmentTarget(name, commandTargets[index], partResults[index])
       )
     }
 
-    return [{ name: tail, judge: null }]
+    return [{ name: tail }]
   }
 
   if (/^【[^】]+】/.test(tail)) {
-    return [{ name: tail, judge: null }]
+    return [{ name: tail }]
   }
 
   return [
@@ -286,11 +261,6 @@ function normalizeSkillPart(
   const trimmed = part.trim()
   const bracketOnlyMatch = trimmed.match(BRACKET_ONLY_SKILL_REGEX)
   return canonicalizeTargetName(bracketOnlyMatch?.[1] ?? trimmed, aliases)
-}
-
-function isStatusTargetName(targetName: string): boolean {
-  const normalized = targetName.replace(/\s+/g, '').toUpperCase()
-  return STATUS_TARGET_NAMES.has(normalized) || ABILITY_EXPRESSION_REGEX.test(normalized)
 }
 
 /**
@@ -353,12 +323,12 @@ function createCommandResultRegex(commandPrefix: string): RegExp {
 }
 
 /**
- * コンバインコマンドの `[parts]` 部分から各パートのアウトカムを抽出する。
+ * コンバインコマンドの `[parts]` 部分から各パートの結果テキストを抽出する。
  *
  * @param rawParts - '[成功, 失敗]' の内側テキスト、または undefined
- * @returns アウトカム文字列の配列
+ * @returns 結果テキスト文字列の配列
  */
-function parsePartOutcomes(rawParts: string | undefined): string[] {
+function parsePartResults(rawParts: string | undefined): string[] {
   return rawParts
     ? rawParts
         .split(SKILL_SEPARATOR_REGEX)

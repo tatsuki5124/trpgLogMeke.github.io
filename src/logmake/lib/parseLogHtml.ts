@@ -192,10 +192,10 @@ function parseParagraphs(
       continue
     }
 
-    const dice = system.log.parseToken(fragment)
+    const result = system.log.parseToken(fragment)
     currentTokens.push({
       content: fragment,
-      ...(dice ? { dice, highlight: dice.highlight } : {}),
+      ...(result ? { dice: result.dice, highlight: result.highlight } : {}),
     })
   }
 

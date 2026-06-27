@@ -28,11 +28,9 @@ const rollAnalysis: DiceRollAnalysis = {
       dice: {
         rawText: 'CCB&lt;=50 目星 ＞ 10 ＞ 成功',
         command: 'CCB&lt;=50',
-        outcomeText: '成功',
+        resultText: '成功',
         primaryRoll: 10,
-        rolls: [10],
         targets: [],
-        status: false,
       },
     },
     {
@@ -44,11 +42,9 @@ const rollAnalysis: DiceRollAnalysis = {
       dice: {
         rawText: 'CBR(50,40) ＞ 90[失敗,失敗] ＞ 失敗',
         command: 'CBR(50,40)',
-        outcomeText: '失敗',
+        resultText: '失敗',
         primaryRoll: 90,
-        rolls: [90],
         targets: [],
-        status: false,
       },
     },
   ],

@@ -20,11 +20,9 @@ const mockAnalysis: GrowthAnalysis = {
             dice: {
               rawText: 'CCB&lt;=45 図書館 ＞ 45 ＞ 成功',
               command: 'CCB&lt;=45',
-              outcomeText: '成功',
+              resultText: '成功',
               primaryRoll: 45,
-              rolls: [45],
               targets: [],
-              status: true,
             },
           },
           targetNames: ['図書館'],
@@ -48,7 +46,7 @@ const mockAnalysis: GrowthAnalysis = {
         dice: {
           rawText: 'CCB&lt;=45 図書館 ＞ 45 ＞ 成功',
           command: 'CCB&lt;=45',
-          outcomeText: '成功',
+          resultText: '成功',
           primaryRoll: 45,
           rolls: [45],
           targets: [],

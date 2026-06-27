@@ -1,11 +1,37 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
-import type { JudgmentTarget, DiceHighlight } from '@/logmake/types'
+import type { JudgmentTarget, ResultHighlight } from '@/logmake/types'
 
 const TAG_REGEX = /<[^>]+>/g
 
 /** CoC の成長判定アウトカムを検出する正規表現 */
 export const COC_GROWTH_OUTCOME_REGEX =
   /クリティカル|決定的成功|スペシャル|イクストリーム成功|ハード成功|成功|失敗|ファンブル|致命的失敗|故障/
+
+/** SAN・能力値ロールなど、成長判定表示で切り分けたい特殊ステータス名 */
+const STATUS_TARGET_NAMES = new Set([
+  'SAN',
+  'SAN値チェック',
+  '正気度',
+  '正気度ロール',
+  'STR',
+  'CON',
+  'POW',
+  'DEX',
+  'APP',
+  'SIZ',
+  'INT',
+  'EDU',
+  'アイデア',
+  '幸運',
+  'ショックロール',
+  '知識',
+])
+const ABILITY_TARGET_NAMES = ['STR', 'CON', 'POW', 'DEX', 'APP', 'SIZ', 'INT', 'EDU'] as const
+const ABILITY_TARGET_PATTERN = ABILITY_TARGET_NAMES.join('|')
+const ABILITY_FACTOR_PATTERN = `(?:${ABILITY_TARGET_PATTERN})(?:[*×]\\d+)?`
+const ABILITY_EXPRESSION_REGEX = new RegExp(
+  `^(?:${ABILITY_FACTOR_PATTERN})(?:\\+(?:${ABILITY_FACTOR_PATTERN}))*$`
+)
 
 /**
  * 技能名テールから HTML タグと余分な空白を除去する。
@@ -19,48 +45,57 @@ export function cleanSkillTail(tail: string): string {
 
 /**
  * JudgmentTarget オブジェクトを生成する。
- * target が未定義の場合は judge を null にする。
  *
  * @param name - 技能名
  * @param target - 目標値（目標値なしの場合は undefined）
- * @param outcomeText - この目標に対する個別アウトカムテキスト
+ * @param partResultText - この目標に対する個別結果テキスト
  * @returns 生成した JudgmentTarget
  */
 export function createJudgmentTarget(
   name: string,
   target: number | undefined,
-  outcomeText?: string,
+  partResultText?: string,
 ): JudgmentTarget {
   return {
     name,
-    judge: target === undefined ? null : `&lt;=${target} 【${name}】`,
-    ...(outcomeText ? { outcomeText } : {}),
+    ...(partResultText ? { partResultText } : {}),
     ...(target === undefined ? {} : { target }),
   }
 }
 
 /**
- * アウトカムテキストから CoC のダイスハイライト種別を判定する。
+ * アウトカムテキストから CoC の結果ハイライト種別を判定する。
  *
- * @param outcomeText - 判定するアウトカムテキスト
+ * @param resultText - 判定する結果テキスト
  * @returns 成功なら 'success'、失敗なら 'failure'、それ以外は undefined
  */
 export function classifyCocHighlight(
-  outcomeText: string,
-): DiceHighlight | undefined {
+  resultText: string,
+): ResultHighlight | undefined {
   if (
     /クリティカル|決定的成功|スペシャル|イクストリーム成功|ハード成功|成功/.test(
-      outcomeText,
+      resultText,
     )
   ) {
     return 'success'
   }
 
-  if (/失敗|ファンブル|致命的失敗/.test(outcomeText)) {
+  if (/失敗|ファンブル|致命的失敗/.test(resultText)) {
     return 'failure'
   }
 
   return undefined
+}
+
+/**
+ * 判定対象名がステータス（能力値・SAN 等）かどうかを判定する。
+ *
+ * @param targetName - 判定対象の名前
+ * @returns ステータスなら true
+ */
+export function isStatusTargetName(targetName: string): boolean {
+  const normalized = targetName.replace(/\s+/g, '').toUpperCase()
+  return STATUS_TARGET_NAMES.has(normalized) || ABILITY_EXPRESSION_REGEX.test(normalized)
 }
 
 /**

@@ -19,8 +19,8 @@ export type GrowthLabel =
   | '通常成功'
   | '通常失敗'
 
-/** ダイス結果トークンの強調表示種別 */
-export type DiceHighlight = 'success' | 'failure'
+/** 判定結果の強調表示種別 */
+export type ResultHighlight = 'success' | 'failure'
 
 /**
  * ログ整形の出力設定。
@@ -61,8 +61,7 @@ export interface CharacterConfig {
  */
 export interface JudgmentTarget {
   name: string
-  judge: string | null
-  outcomeText?: string
+  partResultText?: string
   target?: number
 }
 
@@ -73,13 +72,16 @@ export interface JudgmentTarget {
 export interface DiceEvent {
   rawText: string
   command: string
-  outcomeText: string
+  resultText: string
   primaryRoll: number | null
-  rolls: number[]
   targets: JudgmentTarget[]
-  status: boolean
-  highlight?: DiceHighlight
   meta?: Record<string, unknown>
+}
+
+/** parseToken の戻り値。パース結果と表示アノテーションを分離する */
+export interface DiceTokenResult {
+  dice: DiceEvent
+  highlight?: ResultHighlight
 }
 
 /**
@@ -88,7 +90,7 @@ export interface DiceEvent {
  */
 export interface ContentToken {
   content: string
-  highlight?: DiceHighlight
+  highlight?: ResultHighlight
   dice?: DiceEvent
 }
 

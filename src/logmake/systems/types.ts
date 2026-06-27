@@ -1,7 +1,7 @@
 import type { DefaultSkillValueMap } from '@/logmake/lib/defaultSkillValues'
 import type {
   DiceEvent,
-  DiceRollRecord,
+  DiceTokenResult,
   GameSystem,
   GrowthLabel,
   GrowthTargetKind,
@@ -10,7 +10,7 @@ import type {
 /** GrowthCapability.classifyEvent に渡す判定オプション */
 export interface ClassifyGrowthEventOptions {
   defaultSkillValues: DefaultSkillValueMap
-  roll: DiceRollRecord
+  dice: DiceEvent
 }
 
 /** システム固有の成長判定分類結果 */
@@ -41,7 +41,7 @@ export interface LogmakeSystem {
   name: string
   log: {
     normalizeSource(content: string): string
-    parseToken(fragment: string): DiceEvent | undefined
+    parseToken(fragment: string): DiceTokenResult | undefined
   }
   growth?: GrowthCapability
 }

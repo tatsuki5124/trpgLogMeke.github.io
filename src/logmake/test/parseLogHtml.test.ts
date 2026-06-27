@@ -62,7 +62,7 @@ describe('parseLogHtml', () => {
     expect(parsed.entries[0].paragraphs[0].tokens[0].dice).toMatchObject({
       targets: [{ name: '目星' }],
       primaryRoll: 10,
-      outcomeText: 'ハード成功',
+      resultText: 'ハード成功',
     })
   })
 
@@ -111,61 +111,57 @@ describe('parseLogHtml', () => {
       command: 'CCB&lt;=25',
       targets: [{ name: '目星' }],
       primaryRoll: 17,
-      outcomeText: '成功',
-      highlight: 'success',
+      resultText: '成功',
     })
+    expect(repeatedTokens[1].highlight).toBe('success')
     expect(repeatedTokens[3].dice).toMatchObject({
       primaryRoll: 100,
-      outcomeText: '致命的失敗',
-      highlight: 'failure',
+      resultText: '致命的失敗',
     })
+    expect(repeatedTokens[3].highlight).toBe('failure')
     expect(commandTokens[0].dice).toMatchObject({
       targets: [],
       primaryRoll: 35,
-      outcomeText: '成功',
-      highlight: 'success',
+      resultText: '成功',
     })
+    expect(commandTokens[0].highlight).toBe('success')
     expect(commandTokens[1].dice).toMatchObject({
       targets: [],
       primaryRoll: 73,
-      outcomeText: '失敗',
-      highlight: 'failure',
+      resultText: '失敗',
     })
+    expect(commandTokens[1].highlight).toBe('failure')
     expect(cbrToken?.dice?.targets).toEqual([
       {
         name: 'こぶし（パンチ）',
-        judge: '&lt;=80 【こぶし（パンチ）】',
-        outcomeText: '成功',
+        partResultText: '成功',
         target: 80,
       },
       {
         name: 'マーシャルアーツ',
-        judge: '&lt;=45 【マーシャルアーツ】',
-        outcomeText: '成功',
+        partResultText: '成功',
         target: 45,
       },
     ])
     expect(partialToken?.dice?.targets).toEqual([
       {
         name: 'こぶし（パンチ）',
-        judge: '&lt;=50 【こぶし（パンチ）】',
-        outcomeText: '成功',
+        partResultText: '成功',
         target: 50,
       },
       {
         name: '組み付き',
-        judge: '&lt;=25 【組み付き】',
-        outcomeText: '失敗',
+        partResultText: '失敗',
         target: 25,
       },
     ])
     expect(fallbackToken?.dice?.targets).toEqual([
-      { name: '【攻撃】対象：XX', judge: null },
+      { name: '【攻撃】対象：XX' },
     ])
     expect(malfunctionToken?.dice).toMatchObject({
-      targets: [{ name: '拳銃', judge: '&lt;=60 【拳銃】', target: 60 }],
+      targets: [{ name: '拳銃', target: 60 }],
       primaryRoll: 95,
-      outcomeText: '故障',
+      resultText: '故障',
     })
     expect(malfunctionToken?.highlight).toBeUndefined()
   })
@@ -198,15 +194,15 @@ describe('parseLogHtml', () => {
     expect(repeatedTokens[1].dice).toMatchObject({
       targets: [{ name: '目星' }],
       primaryRoll: 10,
-      outcomeText: 'ハード成功',
+      resultText: 'ハード成功',
       meta: { cocOption: 'h' },
     })
     expect(parsed.entries[1].paragraphs[0].tokens[0].dice).toMatchObject({
       targets: [],
       primaryRoll: 100,
-      outcomeText: 'ファンブル',
-      highlight: 'failure',
+      resultText: 'ファンブル',
     })
+    expect(parsed.entries[1].paragraphs[0].tokens[0].highlight).toBe('failure')
   })
 
   it('parses CoC7 bonus/penalty dice notation and difficulty suffixes', () => {
@@ -223,27 +219,27 @@ describe('parseLogHtml', () => {
     expect(dice[0]).toMatchObject({
       primaryRoll: 81,
       meta: { cocOption: 'r' },
-      outcomeText: '失敗',
+      resultText: '失敗',
     })
     expect(dice[1]).toMatchObject({
       primaryRoll: 13,
       meta: { cocOption: 'e' },
-      outcomeText: '成功',
+      resultText: '成功',
     })
     expect(dice[2]).toMatchObject({
       primaryRoll: 62,
       meta: { cocOption: 'h' },
-      outcomeText: '失敗',
+      resultText: '失敗',
     })
     expect(dice[3]).toMatchObject({
       primaryRoll: 3,
       meta: { cocOption: 'h' },
-      outcomeText: '成功',
+      resultText: '成功',
     })
     expect(dice[4]).toMatchObject({
       primaryRoll: 63,
       meta: { cocOption: 'e' },
-      outcomeText: '失敗',
+      resultText: '失敗',
     })
   })
 
@@ -271,14 +267,13 @@ describe('parseLogHtml', () => {
       command: '1d100&lt;=50',
       targets: [],
       primaryRoll: 89,
-      outcomeText: '失敗',
+      resultText: '失敗',
     })
     expect(dice[1]).toMatchObject({
       command: '1d100&lt;=50',
       targets: [{ name: '正気度ロール', target: 50 }],
       primaryRoll: 89,
-      outcomeText: '失敗',
-      status: true,
+      resultText: '失敗',
     })
   })
 
@@ -310,25 +305,23 @@ describe('parseLogHtml', () => {
       command: 'sCCB&lt;=50',
       targets: [{ name: '目星', target: 50 }],
       primaryRoll: 30,
-      outcomeText: '成功',
+      resultText: '成功',
     })
     expect(dice[1]).toMatchObject({
       command: 'sRESB(12-10)',
       targets: [],
       primaryRoll: 35,
-      outcomeText: '成功',
+      resultText: '成功',
     })
     expect(dice[2]?.targets).toEqual([
       {
         name: 'こぶし（パンチ）',
-        judge: '&lt;=50 【こぶし（パンチ）】',
-        outcomeText: '成功',
+        partResultText: '成功',
         target: 50,
       },
       {
         name: '組み付き',
-        judge: '&lt;=25 【組み付き】',
-        outcomeText: '失敗',
+        partResultText: '失敗',
         target: 25,
       },
     ])
@@ -398,7 +391,7 @@ describe('parseLogHtml', () => {
     }
   })
 
-  it('marks only exact status target names as status-dependent records', () => {
+  it('parses target names from bracket skill notation', () => {
     const html = `
       <!DOCTYPE html>
       <html lang="ja">
@@ -420,11 +413,9 @@ describe('parseLogHtml', () => {
 
     expect(dice[0]).toMatchObject({
       targets: [{ name: '図書館' }],
-      status: false,
     })
     expect(dice[1]).toMatchObject({
       targets: [{ name: 'POW' }],
-      status: true,
     })
   })
 })

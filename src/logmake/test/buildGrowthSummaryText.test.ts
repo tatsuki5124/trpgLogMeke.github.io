@@ -16,11 +16,9 @@ const record = (
     dice: {
       rawText: 'CCB&lt;=1 【目星】 (1D100&lt;=1) ＞ 1 ＞ 成功',
       command: 'CCB&lt;=1',
-      outcomeText: '成功',
+      resultText: '成功',
       primaryRoll: 1,
-      rolls: [1],
       targets: [],
-      status: false,
     },
   },
   status: false,

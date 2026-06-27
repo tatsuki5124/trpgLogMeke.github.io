@@ -1,5 +1,6 @@
 import {
   COC_GROWTH_OUTCOME_REGEX,
+  isStatusTargetName,
   readCocOption,
 } from '@/logmake/systems/coc/shared'
 import type { GrowthCapability, GrowthClassification } from '@/logmake/systems/types'
@@ -42,13 +43,12 @@ export function createCocGrowth(config: CocGrowthConfig): GrowthCapability {
     async loadDefaultSkillValues() {
       return normalizeDefaultSkillValues(config.rawDefaultSkillValues)
     },
-    classifyEvent({ defaultSkillValues, roll }) {
-      const dice = roll.dice
-      if (!COC_GROWTH_OUTCOME_REGEX.test(dice.outcomeText)) {
+    classifyEvent({ defaultSkillValues, dice }) {
+      if (!COC_GROWTH_OUTCOME_REGEX.test(dice.resultText)) {
         return null
       }
 
-      const outcome = dice.outcomeText
+      const outcome = dice.resultText
       const cocOption = readCocOption(dice.meta)
       const isCritical =
         /クリティカル|決定的成功/.test(outcome) || cocOption === 'c'
@@ -152,7 +152,7 @@ function createClassification(params: {
     label: params.label,
     targetNames: params.targetNames,
     initialSuccessTargetNames: params.initialSuccessTargetNames,
-    status: params.dice.status,
+    status: params.dice.targets.some((target) => isStatusTargetName(target.name)),
     targetKind: params.targetKind,
   }
 }
@@ -175,7 +175,7 @@ function classifyTargetKind(dice: DiceEvent): GrowthTargetKind {
   if (/^S?CBRB?\(/i.test(dice.command) && dice.targets.length === 0) {
     return 'combination'
   }
-  if (dice.targets.some((target) => target.judge === null)) {
+  if (dice.targets.some((target) => target.target === undefined)) {
     return 'unlistedSkill'
   }
   return 'listedSkill'
@@ -195,7 +195,7 @@ function isInitialSuccessTarget(
 
 function isTargetSuccess(dice: DiceEvent, target: JudgmentTarget): boolean {
   const outcome =
-    target.outcomeText ?? (dice.targets.length === 1 ? dice.outcomeText : '')
+    target.partResultText ?? (dice.targets.length === 1 ? dice.resultText : '')
   return /クリティカル|決定的成功|スペシャル|イクストリーム成功|ハード成功|成功/.test(
     outcome,
   )
