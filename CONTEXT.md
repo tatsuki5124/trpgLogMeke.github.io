@@ -28,11 +28,12 @@ TRPG Log Maker で使う型名・値名の正規定義。
 
 | 型名 | 説明 |
 |---|---|
-| `DiceEvent` | 1 ダイスロールイベントの解析結果。チャットログの 1 フラグメントから抽出 |
+| `DiceTokenResult` | `parseToken` の戻り値。パース結果 (`dice`) と表示アノテーション (`highlight`) を分離して保持 |
+| `DiceEvent` | 1 ダイスロールイベントの純粋なパース結果。表示関心やシステム固有の分類を含まない |
 | `JudgmentTarget` | ダイスロールの判定対象（技能・能力値など）。複合コマンドでは複数存在 |
-| `DiceRollRecord` | 採用出目 1 件分のレコード。グラフ・成長判定で共有 |
-| `DiceRollAnalysis` | ログ全体の採用出目分析結果 |
-| `DiceHighlight` | ダイス結果トークンの強調表示種別（`success` / `failure`） |
+| `DiceRecord` | 採用出目 1 件分のレコード。グラフ・成長判定で共有 |
+| `DiceAnalysis` | ログ全体の採用出目分析結果 |
+| `ResultHighlight` | ダイス結果トークンの強調表示種別（`success` / `failure`）。`ContentToken` に保持 |
 
 ## 成長判定
 
@@ -41,9 +42,9 @@ TRPG Log Maker で使う型名・値名の正規定義。
 | `GrowthRecord` | 成長判定 1 件分の表示レコード |
 | `GrowthAnalysis` | ログ全体の成長判定分析結果。キャラクター別・ラベル別に集約 |
 | `GrowthLabel` | 成長判定の分類ラベル（クリティカル・スペシャル等） |
-| `GrowthTargetKind` | 成長チェック上の判定対象種別 |
+| `GrowthKind` | 成長チェック上の判定対象種別 |
 
-### GrowthTargetKind の値
+### GrowthKind の値
 
 | 値 | 意味 |
 |---|---|
